@@ -1,0 +1,33 @@
+parent	control			
+px	px			+
+px	%			+
+px	auto			+
+%	px			+
+%	%			+
+%	auto			+
+
+auto	px
+auto	%
+auto	auto
+
+
+ControlType
+-----------------------------
+Label		caption + padding + icon
+TextBox		100%
+ListBox		100%
+ComboBox	100%
+Button		caption + padding + icon
+
+
+Size
+--------------
+Window
+(%)		wzglêdem ekranu
+(px)
+(auto)		wzglêdem kontrolek + padding
+
+Frame
+(%)		wzglêdem okna
+(auto)		wzglêdem kontrolek
+

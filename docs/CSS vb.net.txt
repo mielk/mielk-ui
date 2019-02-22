@@ -1,0 +1,27 @@
+1) Stwórz Window (nie wyœwietla)
+2) (Window.constructor) Stwórz i dodaj Panel
+	Za³aduj klasy CSS
+	Update StylesMatrix [Case 1]
+	Update aktualnych w³aœciwoœci
+	Update kontrolki
+3) Za³aduj kontrolki z HTML
+	jw.
+4) Rozmieœæ kontrolki w panelu
+5) Wyœwietl okno
+
+
+
+Case 1 - Update StylesMatrix
+
+
+
+Case 2 - £adowanie kontrolek z HTML
+1) Tylko label
+2) Labels + buttons
+3) Tabs
+4) Scroll
+5) Options container
+6) Options container + buttons
+7) Buttons container
+8) List
+9) Drop down

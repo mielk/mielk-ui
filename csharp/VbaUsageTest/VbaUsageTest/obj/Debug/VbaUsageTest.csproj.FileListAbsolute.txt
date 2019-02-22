@@ -1,0 +1,11 @@
+c:\users\tomek\documents\visual studio 2012\Projects\VbaUsageTest\VbaUsageTest\bin\Debug\VbaUsageTest.dll
+c:\users\tomek\documents\visual studio 2012\Projects\VbaUsageTest\VbaUsageTest\bin\Debug\VbaUsageTest.pdb
+c:\users\tomek\documents\visual studio 2012\Projects\VbaUsageTest\VbaUsageTest\bin\Debug\VbaUsageTest.tlb
+c:\users\tomek\documents\visual studio 2012\Projects\VbaUsageTest\VbaUsageTest\obj\Debug\VbaUsageTest.csprojResolveAssemblyReference.cache
+c:\users\tomek\documents\visual studio 2012\Projects\VbaUsageTest\VbaUsageTest\obj\Debug\VbaUsageTest.dll
+c:\users\tomek\documents\visual studio 2012\Projects\VbaUsageTest\VbaUsageTest\obj\Debug\VbaUsageTest.pdb
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\CSharp project\VbaUsageTest\VbaUsageTest\bin\Debug\VbaUsageTest.dll
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\CSharp project\VbaUsageTest\VbaUsageTest\bin\Debug\VbaUsageTest.pdb
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\CSharp project\VbaUsageTest\VbaUsageTest\bin\Debug\VbaUsageTest.tlb
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\CSharp project\VbaUsageTest\VbaUsageTest\obj\Debug\VbaUsageTest.dll
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\CSharp project\VbaUsageTest\VbaUsageTest\obj\Debug\VbaUsageTest.pdb

@@ -1,0 +1,18 @@
+c:\users\tomek\documents\visual studio 2012\Projects\MielkVb\MielkVb\bin\Debug\MielkVb.exe.config
+C:\Users\Tomek\documents\visual studio 2012\Projects\MielkVb\MielkVb\bin\Debug\MielkVb.exe
+C:\Users\Tomek\documents\visual studio 2012\Projects\MielkVb\MielkVb\bin\Debug\MielkVb.pdb
+C:\Users\Tomek\documents\visual studio 2012\Projects\MielkVb\MielkVb\bin\Debug\MielkVb.xml
+C:\Users\Tomek\documents\visual studio 2012\Projects\MielkVb\MielkVb\obj\Debug\MielkVb.Resources.resources
+C:\Users\Tomek\documents\visual studio 2012\Projects\MielkVb\MielkVb\obj\Debug\MielkVb.vbproj.GenerateResource.Cache
+C:\Users\Tomek\documents\visual studio 2012\Projects\MielkVb\MielkVb\obj\Debug\MielkVb.exe
+C:\Users\Tomek\documents\visual studio 2012\Projects\MielkVb\MielkVb\obj\Debug\MielkVb.xml
+C:\Users\Tomek\documents\visual studio 2012\Projects\MielkVb\MielkVb\obj\Debug\MielkVb.pdb
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\MielkVb\MielkVb\bin\Debug\MielkVb.exe.config
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\MielkVb\MielkVb\obj\Debug\MielkVb.exe
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\MielkVb\MielkVb\obj\Debug\MielkVb.xml
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\MielkVb\MielkVb\obj\Debug\MielkVb.pdb
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\MielkVb\MielkVb\bin\Debug\MielkVb.exe
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\MielkVb\MielkVb\bin\Debug\MielkVb.pdb
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\MielkVb\MielkVb\bin\Debug\MielkVb.xml
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\MielkVb\MielkVb\obj\Debug\MielkVb.Resources.resources
+C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\MielkVb\MielkVb\obj\Debug\MielkVb.vbproj.GenerateResource.Cache

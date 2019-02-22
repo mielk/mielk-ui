@@ -1,0 +1,11 @@
+<form id="test-form" class="test">
+	<div id="container">
+		<label id="lbl1">Polska</label>
+		<label id="lbl2" class="odd">Senegal</label>
+	</div>
+	<label id="test-label">Polska</label>
+	<label id="test-label2" class="odd">Senegal</label>
+	<label id="test-label3">Kolumbia</label>
+	<label id="test-label4" class="odd">Japonia</label>
+</form>
+<!-- <x></x> -->
