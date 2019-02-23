@@ -38,6 +38,7 @@
             Case "padding-left" : Return StylePropertyEnum.StyleProperty_PaddingLeft
             Case "float" : Return StylePropertyEnum.StyleProperty_Float
             Case "position" : Return StylePropertyEnum.StyleProperty_Position
+            Case "border-box" : Return StylePropertyEnum.StyleProperty_BorderBox
             Case "top" : Return StylePropertyEnum.StyleProperty_Top
             Case "right" : Return StylePropertyEnum.StyleProperty_Right
             Case "bottom" : Return StylePropertyEnum.StyleProperty_Bottom

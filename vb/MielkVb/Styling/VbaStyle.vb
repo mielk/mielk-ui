@@ -17,6 +17,7 @@
     '[Layout]
     Private pPosition As Object                ' CssPositionEnum
     Private pFloat As Object                   ' CssFloatEnum
+    Private pBorderBox As Object               ' ???
     Private pTop As Object                     ' Single
     Private pBottom As Object                  ' Single
     Private pLeft As Object                    ' Single
@@ -97,6 +98,7 @@
             Case StylePropertyEnum.StyleProperty_PaddingLeft : Call setPaddingLeft(propertyValue)
             Case StylePropertyEnum.StyleProperty_Float : Call setFloat(propertyValue)
             Case StylePropertyEnum.StyleProperty_Position : Call setPosition(propertyValue)
+            Case StylePropertyEnum.StyleProperty_BorderBox : Call setBorderBox(propertyValue)
             Case StylePropertyEnum.StyleProperty_Top : Call setTop(propertyValue)
             Case StylePropertyEnum.StyleProperty_Right : Call setRight(propertyValue)
             Case StylePropertyEnum.StyleProperty_Bottom : Call setBottom(propertyValue)
@@ -208,6 +210,10 @@
     Public Function setFloat(value As Object) As VbaStyle
         setFloat = Me
         pFloat = value
+    End Function
+    Public Function setBorderBox(value As Object) As VbaStyle
+        setBorderBox = Me
+        pBorderBox = value
     End Function
     Public Function setPosition(value As Object) As VbaStyle
         setPosition = Me
@@ -335,6 +341,9 @@
     Public Function getFloat() As Object
         getFloat = pFloat
     End Function
+    Public Function getBorderBox() As Object
+        getBorderBox = pBorderBox
+    End Function
     Public Function getPosition() As Object
         getPosition = pPosition
     End Function
@@ -380,6 +389,7 @@
             '[Position]
             Case VbaStylePropertyEnum.StyleProperty_Float : Return getFloat()
             Case VbaStylePropertyEnum.StyleProperty_Position : Return getPosition()
+            Case VbaStylePropertyEnum.StyleProperty_BorderBox : Return getBorderBox()
             Case VbaStylePropertyEnum.StyleProperty_Top : Return getTop()
             Case VbaStylePropertyEnum.StyleProperty_Left : Return getLeft()
             Case VbaStylePropertyEnum.StyleProperty_Bottom : Return getBottom()
@@ -452,6 +462,7 @@
             Call .Add(VbaStylePropertyEnum.StyleProperty_PaddingLeft, getPaddingLeft)
             Call .Add(VbaStylePropertyEnum.StyleProperty_Float, getFloat)
             Call .Add(VbaStylePropertyEnum.StyleProperty_Position, getPosition)
+            Call .Add(VbaStylePropertyEnum.StyleProperty_BorderBox, getBorderBox)
             Call .Add(VbaStylePropertyEnum.StyleProperty_Top, getTop)
             Call .Add(VbaStylePropertyEnum.StyleProperty_Right, getRight)
             Call .Add(VbaStylePropertyEnum.StyleProperty_Bottom, getBottom)

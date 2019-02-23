@@ -9,6 +9,7 @@ Public Class Style
     '[Position]
     Private pFloat As StylePropertyValue
     Private pPosition As StylePropertyValue
+    Private pBorderBox As StylePropertyValue
     Private pTop As StylePropertyValue
     Private pLeft As StylePropertyValue
     Private pBottom As StylePropertyValue
@@ -85,6 +86,7 @@ Public Class Style
     Private Sub loadPropertiesFromVbaObject(vbaObject As Object)
         Float = convertValue(vbaObject.GetPropertyAsString(StylePropertyEnum.StyleProperty_Float))
         Position = convertValue(vbaObject.GetPropertyAsString(StylePropertyEnum.StyleProperty_Position))
+        BorderBox = convertValue(vbaObject.GetPropertyAsString(StylePropertyEnum.StyleProperty_BorderBox))
         Top = convertValue(vbaObject.GetPropertyAsString(StylePropertyEnum.StyleProperty_Top))
         Left = convertValue(vbaObject.GetPropertyAsString(StylePropertyEnum.StyleProperty_Left))
         Bottom = convertValue(vbaObject.GetPropertyAsString(StylePropertyEnum.StyleProperty_Bottom))
@@ -168,6 +170,15 @@ Public Class Style
         End Get
         Set(value As StylePropertyValue)
             pPosition = value
+        End Set
+    End Property
+
+    Public Property BorderBox() As StylePropertyValue
+        Get
+            Return pBorderBox
+        End Get
+        Set(value As StylePropertyValue)
+            pBorderBox = value
         End Set
     End Property
 
@@ -280,6 +291,7 @@ Public Class Style
             Return pMargins
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pMargins = value
         End Set
     End Property
@@ -289,6 +301,7 @@ Public Class Style
             Return pMarginTop
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pMarginTop = value
         End Set
     End Property
@@ -298,6 +311,7 @@ Public Class Style
             Return pMarginLeft
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pMarginLeft = value
         End Set
     End Property
@@ -307,6 +321,7 @@ Public Class Style
             Return pMarginBottom
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pMarginBottom = value
         End Set
     End Property
@@ -316,6 +331,7 @@ Public Class Style
             Return pMarginRight
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pMarginRight = value
         End Set
     End Property
@@ -325,6 +341,7 @@ Public Class Style
             Return pPaddings
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pPaddings = value
         End Set
     End Property
@@ -334,6 +351,7 @@ Public Class Style
             Return pPaddingTop
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pPaddingTop = value
         End Set
     End Property
@@ -343,6 +361,7 @@ Public Class Style
             Return pPaddingLeft
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pPaddingLeft = value
         End Set
     End Property
@@ -352,6 +371,7 @@ Public Class Style
             Return pPaddingBottom
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pPaddingBottom = value
         End Set
     End Property
@@ -361,6 +381,7 @@ Public Class Style
             Return pPaddingRight
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pPaddingRight = value
         End Set
     End Property
@@ -528,6 +549,7 @@ Public Class Style
     End Sub
 
 #End Region
+
 
 #Region "Access"
 

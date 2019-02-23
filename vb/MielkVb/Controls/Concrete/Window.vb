@@ -133,7 +133,7 @@ Public Class Window
     Private pTitle As String
 
     '[Controls]
-    'Private pBody As Body
+    Private pBody As Body
 
     '[State]
     Private pIsDisplayed As Boolean
@@ -152,8 +152,8 @@ Public Class Window
     Public Sub New()
         Visible = pVisible
         pHandle = Me.Handle
+        Call CreateBody()
         pStylesMatrix = New StylesMatrix(Me, False)
-        'Call createBody()
     End Sub
 
 #End Region
@@ -493,9 +493,15 @@ Public Class Window
         Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingLeft)
     End Function
 
+    Public Function GetBodyWidth() As Single
+        Return Me.ClientSize.Width - GetPaddingsWidth()
+    End Function
+
+    Public Function GetBodyHeight() As Single
+        Return Me.ClientSize.Height - GetPaddingsHeight()
+    End Function
+
 #End Region
-
-
 
 
 
@@ -512,6 +518,7 @@ Public Class Window
         '---------------------------------------------------------------------------------------------------------
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_Float, newProperties(StylePropertyEnum.StyleProperty_Float), positionChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_Position, newProperties(StylePropertyEnum.StyleProperty_Position), positionChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_BorderBox, newProperties(StylePropertyEnum.StyleProperty_BorderBox), sizeChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_Top, newProperties(StylePropertyEnum.StyleProperty_Top), positionChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_Left, newProperties(StylePropertyEnum.StyleProperty_Left), positionChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_Bottom, newProperties(StylePropertyEnum.StyleProperty_Bottom), positionChanged)
@@ -549,9 +556,9 @@ Public Class Window
 
         If insidePropertiesChanged Then Call updateInsideProperties()
         If bordersChanged Then Call updateBorders()
-        If insideLayoutChanged And Not sizeChanged Then rearrangeControls()
-        If sizeChanged Then Call updateSize()
+        If sizeChanged Then Call updateSize(insideLayoutChanged)
         If positionChanged Then Call updatePosition()
+        If insideLayoutChanged Then Call rearrangeControls()
 
     End Sub
 
@@ -565,8 +572,18 @@ Public Class Window
     End Sub
 
 
-    Private Sub updateSize()
+
+    Public Sub UpdateSizeAndPosition(Optional ByRef anyChanges As Boolean = False) Implements IControl.UpdateSizeAndPosition
+        Call updateSize(anyChanges)
+        Call updatePosition()
+        Call updateTitleBarVisibility()
+        If anyChanges Then Call rearrangeControls()
+    End Sub
+
+    Private Sub updateSize(Optional ByRef anyChanges As Boolean = False)
         Dim updateActive As Boolean
+        Dim height As Single
+        Dim width As Single
         '---------------------------------------------------------------------------------------------------------
 
         If Not pIsRendered Then
@@ -577,10 +594,19 @@ Public Class Window
         End If
 
         If updateActive Then
-            Me.Height = pCurrentProperties(StylePropertyEnum.StyleProperty_Height) + IIf(pBorderBox, 0, Math.Max(GetPaddingTop, 0) + Math.Max(GetPaddingBottom, 0) + GetTitleBarHeigth())
-            Me.Width = pCurrentProperties(StylePropertyEnum.StyleProperty_Width) + IIf(pBorderBox, 0, Math.Max(GetPaddingLeft, 0) + Math.Max(GetPaddingRight, 0))
-            Call updateTitleBarVisibility()
-            Call rearrangeControls()
+            height = pCurrentProperties(StylePropertyEnum.StyleProperty_Height) + IIf(pBorderBox, 0, Math.Max(GetPaddingTop, 0) + Math.Max(GetPaddingBottom, 0) + GetTitleBarHeigth())
+            width = pCurrentProperties(StylePropertyEnum.StyleProperty_Width) + IIf(pBorderBox, 0, Math.Max(GetPaddingLeft, 0) + Math.Max(GetPaddingRight, 0))
+
+            If Me.Width <> width Then
+                Me.Width = width
+                anyChanges = True
+            End If
+
+            If Me.Height <> height Then
+                Me.Height = height
+                anyChanges = True
+            End If
+
         End If
 
     End Sub
@@ -643,70 +669,70 @@ Public Class Window
     End Sub
 
     Private Sub rearrangeControls()
-
+        If Not pBody Is Nothing Then
+            Call pBody.updateSizeAndPosition()
+        End If
     End Sub
 
 #End Region
 
 
+
 #Region "Events"
 
     Private Sub Window_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        'If Not pListener Is Nothing Then
-        '    On Error Resume Next
-        '    Call pListener.RaiseEvent_Load()
-        'End If
+        On Error Resume Next
+        Call pListener.RaiseEvent_Load()
+        On Error GoTo 0
     End Sub
 
     Private Sub Window_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
-        'If Not pListener Is Nothing Then
-        '    On Error Resume Next
-        '    Call pListener.RaiseEvent_Disposed()
-        'End If
+        On Error Resume Next
+        Call pListener.RaiseEvent_Disposed()
+        On Error GoTo 0
     End Sub
 
     Private Sub Window_MouseEnter(sender As Object, e As EventArgs) Handles Me.MouseEnter
         Call hover()
-        'If Not pListener Is Nothing Then
-        '    On Error Resume Next
-        '    Call pListener.RaiseEvent_MouseEnter()
-        'End If
+        On Error Resume Next
+        Call pListener.RaiseEvent_MouseEnter()
+        On Error GoTo 0
     End Sub
 
     Private Sub Window_MouseLeave(sender As Object, e As EventArgs) Handles Me.MouseLeave
         Call unhover()
-        'If Not pListener Is Nothing Then
-        '    On Error Resume Next
-        '    Call pListener.RaiseEvent_MouseLeave()
-        'End If
+        On Error Resume Next
+        Call pListener.RaiseEvent_MouseLeave()
+        On Error GoTo 0
     End Sub
 
     Private Sub Window_GotFocus(sender As Object, e As EventArgs) Handles Me.GotFocus
-        'If Not pListener Is Nothing Then
-        '    On Error Resume Next
-        '    Call pListener.RaiseEvent_GotFocus()
-        'End If
+        On Error Resume Next
+        Call pListener.RaiseEvent_GotFocus()
+        On Error GoTo 0
     End Sub
 
     Private Sub Window_LostFocus(sender As Object, e As EventArgs) Handles Me.LostFocus
-        'If Not pListener Is Nothing Then
-        '    On Error Resume Next
-        '    Call pListener.RaiseEvent_LostFocus()
-        'End If
+        On Error Resume Next
+        Call pListener.RaiseEvent_LostFocus()
+        On Error GoTo 0
     End Sub
 
     Private Sub Window_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-        'If Not pListener Is Nothing Then
-        '    On Error Resume Next
-        '    Call pListener.RaiseEvent_SizeChanged(Me.Width, Me.Height, Me.Left, Me.Top)
-        'End If
+        On Error Resume Next
+        Call rearrangeControls()
+        Call pListener.RaiseEvent_SizeChanged(Me.Width, Me.Height, Me.Left, Me.Top)
+        On Error GoTo 0
+    End Sub
+
+    Private Sub Window_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        Call rearrangeControls()
     End Sub
 
     Private Sub Window_Scroll(sender As Object, e As ScrollEventArgs) Handles Me.Scroll
-        'If Not pListener Is Nothing Then
-        '    On Error Resume Next
-        '    Call pListener.RaiseEvent_Scroll()
-        'End If
+        On Error Resume Next
+        Call pListener.RaiseEvent_Scroll()
+        On Error GoTo 0
     End Sub
 
 #End Region
@@ -726,10 +752,10 @@ Public Class Window
 
 #Region "Managing children"
 
-    'Public Sub CreateBody()
-    '    pBody = New Body(Me)
-    '    Me.Controls.Add(pBody)
-    'End Sub
+    Public Sub CreateBody()
+        pBody = New Body(Me)
+        Me.Controls.Add(pBody)
+    End Sub
 
     'Public Sub AddControl(ctrl As Control)
     '    Call pBody.AddControl(ctrl)

@@ -72,6 +72,12 @@
   <ItemGroup>
     <Compile Include="Controls\Abstract\IContainer.vb" />
     <Compile Include="Controls\Abstract\IControl.vb" />
+    <Compile Include="Controls\Concrete\Body.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\Concrete\Div.vb">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\Concrete\Window.vb">
       <SubType>Form</SubType>
     </Compile>

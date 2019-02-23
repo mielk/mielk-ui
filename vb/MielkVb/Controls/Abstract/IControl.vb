@@ -13,6 +13,9 @@ Public Interface IControl
     Function GetElementTag() As String
     Sub SetParent(parent As IContainer)
 
+    '[Size and position]
+    Sub UpdateSizeAndPosition(Optional ByRef anyChanges As Boolean = False)
+
     ''[Setting inline properties]
     'Sub SetTop(value As VariantType?)
     'Sub SetLeft(value As VariantType?)

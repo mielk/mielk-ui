@@ -1,0 +1,4 @@
+﻿- 1) zmniejszanie Window - branie pod uwagę właściwości minSize i maxSize
+- 2) skalowanie Window przy ustawionych właściwościach auto - branie pod uwagę rozmiaru wewnętrznych elementów
+- 3) skalowanie Window przy ustawionych właściwościach auto - case jeżeli wszystkie wewnętrzne elementy też mają auto
+- 4) wczytywanie HTML

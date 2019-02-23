@@ -9,7 +9,6 @@ Public Class StylesMatrix
     Private pClassStyleSets As List(Of StyleSet)
     Private pInlineStyle As StyleSet
     Private pPropertiesArraysMap(0 To CountStyleNodeTypesEnums(), 0 To CountStylePropertiesEnums()) As Object
-    Private pLog As String
 #End Region
 
 
@@ -28,27 +27,6 @@ Public Class StylesMatrix
     End Sub
 
 #End Region
-
-
-
-
-#Region "Debugging"
-
-    Public Function hasElementStyleSet() As Boolean
-        Return Not pElementStyleSet Is Nothing
-    End Function
-
-    Public Function getElementStyleSet() As StyleSet
-        Return pElementStyleSet
-    End Function
-
-    Public Function getLog() As String
-        Return pLog
-    End Function
-
-#End Region
-
-
 
 
 #Region "Managing styles"
@@ -112,6 +90,7 @@ Public Class StylesMatrix
             pPropertiesArraysMap(nodeType, 0) = True
             Call setPropertyValue(nodeType, StylePropertyEnum.StyleProperty_Float, style.Float)
             Call setPropertyValue(nodeType, StylePropertyEnum.StyleProperty_Position, style.Position)
+            Call setPropertyValue(nodeType, StylePropertyEnum.StyleProperty_BorderBox, style.BorderBox)
             Call setPropertyValue(nodeType, StylePropertyEnum.StyleProperty_Top, style.Top)
             Call setPropertyValue(nodeType, StylePropertyEnum.StyleProperty_Left, style.Left)
             Call setPropertyValue(nodeType, StylePropertyEnum.StyleProperty_Bottom, style.Bottom)

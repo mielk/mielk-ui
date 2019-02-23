@@ -88,15 +88,6 @@ Public Class StylePropertyValue
         End Set
     End Property
 
-    'Public Property Color() As Color
-    '    Get
-    '        Return pColor
-    '    End Get
-    '    Set(v As Color)
-    '        pColor = v
-    '    End Set
-    'End Property
-
 #End Region
 
 End Class
