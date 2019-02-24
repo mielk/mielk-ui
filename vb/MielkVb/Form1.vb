@@ -1,10 +1,17 @@
-﻿Public Class Form1
+﻿Imports System.Xml
+
+Public Class Form1
     Private pStylesManager As StylesManager
+    Private pHtml As HtmlManager
+    Private pVbaWindow As VBAWindow
     Private pWindow As Window
+
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Call loadStyles()
         Call initializeForm()
+        Call loadHtml()
+        Call pWindow.Display()
     End Sub
 
 
@@ -23,13 +30,52 @@
 
     End Sub
 
+    Private Sub loadHtml()
+        Dim pNode As XmlNode
+        '---------------------------------------------------------------------------------------------------------------------------------------
+        pHtml = New HtmlManager("C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\docs\form_basic.xml")
+        pNode = pHtml.GetFormNode()
+        Call pVbaWindow.insertControls(pNode)
+    End Sub
+
     Private Sub initializeForm()
+        pVbaWindow = New VBAWindow()
         pWindow = New Window()
         With pWindow
-            Call .SetListener(Me)
+            Call .SetListener(pVbaWindow)
             Call .SetStylesManager(pStylesManager)
-            Call .Display()
         End With
+        Call pVbaWindow.SetVbWindow(pWindow)
     End Sub
-    
+
+
+
+
+
+    'Private Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click
+
+    'End Sub
+
+    'Private Sub ListBox1_DragDrop(sender As Object, e As DragEventArgs) Handles ListBox1.DragDrop
+    '    Dim files() As String = e.Data.GetData(DataFormats.FileDrop)
+    '    For Each path In files
+    '        MsgBox(path)
+    '    Next
+    'End Sub
+
+    'Private Sub ListBox1_DragEnter(sender As Object, e As DragEventArgs) Handles ListBox1.DragEnter
+    '    If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+    '        e.Effect = DragDropEffects.Copy
+    '    End If
+    'End Sub
+
+    'Private Sub ListBox1_DragLeave(sender As Object, e As EventArgs) Handles ListBox1.DragLeave
+    'End Sub
+
+    'Private Sub ListBox1_DragOver(sender As Object, e As DragEventArgs) Handles ListBox1.DragOver
+    'End Sub
+
+    'Private Sub ListBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBox1.SelectedIndexChanged
+
+    'End Sub
 End Class

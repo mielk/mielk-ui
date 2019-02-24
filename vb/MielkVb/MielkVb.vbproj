@@ -49,6 +49,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
+    <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -88,6 +89,7 @@
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="HTML\HtmlManager.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -121,8 +123,16 @@
     <Compile Include="Styling\VbaStylesParser.vb" />
     <Compile Include="Utils\Colors.vb" />
     <Compile Include="Utils\Singletons.vb" />
+    <Compile Include="VBAControls\Controls\VbaDiv.vb" />
+    <Compile Include="VBAControls\IVbaContainer.vb" />
+    <Compile Include="VBAControls\IVbaControl.vb" />
+    <Compile Include="VBAControls\VbaHelperMethods.vb" />
+    <Compile Include="VBAControls\Controls\VbaWindow.vb" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
