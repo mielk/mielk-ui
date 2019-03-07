@@ -22,8 +22,9 @@ Public Class VBAWindow
             elementTag = node.Name
             control = createControlByTag(elementTag, Me)
             If Not control Is Nothing Then
-                '    Call control.loadFromXml(node)
-                '    Call pControls.Add(control)
+                Call control.LoadFromXml(node)
+                Call pControls.Add(control)
+                Call pVbWindow.AddControl(control.getVbNetObject)
             End If
         Next node
 

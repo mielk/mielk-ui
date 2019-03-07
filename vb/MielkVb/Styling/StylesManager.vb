@@ -62,7 +62,7 @@
 
 #Region "Access methods"
 
-    Public Function GetStyleByElementAndClass(elementTag As String, className As String)
+    Public Function GetStyleByElementAndClass(elementTag As String, className As String) As StyleSet
         Dim dict As Dictionary(Of String, StyleSet)
         '-------------------------------------------------------------------
         If pElementClassStyleSets.ContainsKey(elementTag) Then
@@ -77,7 +77,7 @@
         End If
     End Function
 
-    Public Function GetStyleByElementTag(elementTag As String)
+    Public Function GetStyleByElementTag(elementTag As String) As StyleSet
         If pElementStyleSets.ContainsKey(elementTag) Then
             Return pElementStyleSets.Item(elementTag)
         Else
@@ -85,7 +85,7 @@
         End If
     End Function
 
-    Public Function GetStyleByClassName(className As String)
+    Public Function GetStyleByClassName(className As String) As StyleSet
         If pClassStyleSets.ContainsKey(className) Then
             Return pClassStyleSets.Item(className)
         Else
@@ -93,7 +93,7 @@
         End If
     End Function
 
-    Public Function GetStyleById(id As String)
+    Public Function GetStyleById(id As String) As StyleSet
         If pIdStyleSets.ContainsKey(id) Then
             Return pIdStyleSets.Item(id)
         Else

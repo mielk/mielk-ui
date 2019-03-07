@@ -323,19 +323,19 @@ Public Class Div
     '    End If
     'End Sub
 
-    'Private Sub Window_MouseEnter(sender As Object, e As EventArgs) Handles Me.MouseEnter
-    '    If Not pListener Is Nothing Then
-    '        On Error Resume Next
-    '        Call pListener.RaiseEvent_MouseEnter()
-    '    End If
-    'End Sub
+    Private Sub Window_MouseEnter(sender As Object, e As EventArgs) Handles Me.MouseEnter
+        Call hover()
+        On Error Resume Next
+        Call pListener.RaiseEvent_MouseEnter()
+        On Error GoTo 0
+    End Sub
 
-    'Private Sub Window_MouseLeave(sender As Object, e As EventArgs) Handles Me.MouseLeave
-    '    If Not pListener Is Nothing Then
-    '        On Error Resume Next
-    '        Call pListener.RaiseEvent_MouseLeave()
-    '    End If
-    'End Sub
+    Private Sub Window_MouseLeave(sender As Object, e As EventArgs) Handles Me.MouseLeave
+        Call unhover()
+        On Error Resume Next
+        Call pListener.RaiseEvent_MouseLeave()
+        On Error GoTo 0
+    End Sub
 
     'Private Sub Window_GotFocus(sender As Object, e As EventArgs) Handles Me.GotFocus
     '    If Not pListener Is Nothing Then
@@ -383,14 +383,20 @@ Public Class Div
 
     Public Sub AddStyleClass(name As String) Implements IControl.AddStyleClass
         Call pStylesMatrix.AddStyleClass(name)
+        Call calculateProperties()
+        Call updateView()
     End Sub
 
     Public Sub RemoveStyleClass(name As String) Implements IControl.RemoveStyleClass
         Call pStylesMatrix.RemoveStyleClass(name)
+        Call calculateProperties()
+        Call updateView()
     End Sub
 
     Public Sub SetStyleProperty(propertyType As Long, value As Object) Implements IControl.SetStyleProperty
         Call pStylesMatrix.AddInlineStyle(propertyType, value)
+        Call calculateProperties()
+        Call updateView()
     End Sub
 
     Private Function calculateProperties() As Object
@@ -423,6 +429,23 @@ Public Class Div
 
     Public Sub RemoveControl(ctrl As Control)
 
+    End Sub
+
+#End Region
+
+
+
+
+#Region "Visual state changes"
+
+    Private Sub hover()
+        pState = StyleNodeTypeEnum.StyleNodeType_Hover
+        Call updateView()
+    End Sub
+
+    Private Sub unhover()
+        pState = StyleNodeTypeEnum.StyleNodeType_Normal
+        Call updateView()
     End Sub
 
 #End Region

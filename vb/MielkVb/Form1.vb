@@ -8,12 +8,21 @@ Public Class Form1
 
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'Call testHtml()
+        'Call testTransparentFrame()
+    End Sub
+
+
+    Private Sub testHtml()
         Call loadStyles()
         Call initializeForm()
         Call loadHtml()
+
+        Me.TextBox1.AutoSize = False
+        Me.TextBox1.Size = New System.Drawing.Size(142, 87)
+
         Call pWindow.Display()
     End Sub
-
 
     Private Sub loadStyles()
         Dim stylesLoader As VbaStylesLoader
@@ -78,4 +87,13 @@ Public Class Form1
     'Private Sub ListBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBox1.SelectedIndexChanged
 
     'End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Dim form As Window
+        form = New Window
+        form.Show()
+        form.ControlBox = False
+        form.Text = String.Empty
+        form.FormBorderStyle = FormBorderStyle.None
+    End Sub
 End Class

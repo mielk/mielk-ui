@@ -1,16 +1,22 @@
 form {
-	height: 300;
-	padding-left: 6;
-	padding-right: 6;
-	padding-top: 6;
-	padding-bottom: 6;
-	background-color: rgb(110,  230,  150);
+	width: 600;
+	height: 400;
+	padding-left: 0;
+	padding-right: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+	background-color: rgb(255, 255, 255);
 }
 
-form:hover {
-	background-color: rgb(215,  42,  174);
-}
-
-#container{
+.buttons-container{
+	position: absolute;
+	left: -1;
+	right: -1;
+	bottom: -1;
+	height: 36;
 	background-color: rgb(145, 123, 84);
+}
+
+.buttons-container:hover{
+	background-color: rgb(45, 123, 234);
 }

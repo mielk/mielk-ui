@@ -1,4 +1,4 @@
 <form id="test-form" class="test">
-	<div id="container">	
+	<div id="buttons-container" class="buttons-container">
 	</div>
 </form>

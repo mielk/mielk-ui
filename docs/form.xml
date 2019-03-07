@@ -1,11 +1,54 @@
-<form id="test-form" class="test">
-	<div id="container">
-		<label id="lbl1">Polska</label>
-		<label id="lbl2" class="odd">Senegal</label>
+<form id="select-campaign">
+	<div>
+		<list id="campaignList" class="campaign">
+			<item>
+				<label>@Name</label>
+				<icon class="edit"></icon>
+				<icon class="remove"></icon>
+			</item>
+		</list>
+		<button class="blue">{Add}</button>
 	</div>
-	<label id="test-label">Polska</label>
-	<label id="test-label2" class="odd">Senegal</label>
-	<label id="test-label3">Kolumbia</label>
-	<label id="test-label4" class="odd">Japonia</label>
+	
+	<div class="buttons">
+		<button id="ok" class="ok">{Ok}</button>
+		<button id="cancel" class="cancel">{Cancel}</button>
+	</div>
+	
 </form>
-<!-- <x></x> -->
+
+
+<form id="edit-campaign" title="{EditCampaign}">
+	<label id="lblName"></label>
+	<textbox id="txtName"><textbox>
+	
+	<label id="lblCopyData"></label>
+	<combobox id="comboCopyData"><combobox>
+
+	<div class="buttons">
+		<button id="ok" class="ok">{Ok}</button>
+		<button id="cancel" class="cancel">{Cancel}</button>
+	</div>
+
+</form>
+
+
+<form id="complex-form" title="{EditCampaign}">
+	<div id="menubar" class="menubar">
+		<label id="menu_export" class="menuitem">{Export}</label>
+		<label id="menu_clear" class="menuitem">{Clear}</label>
+	</div>
+	
+	
+	<label id="lblName"></label>
+	<textbox id="txtName"><textbox>
+	
+	<label id="lblCopyData"></label>
+	<combobox id="comboCopyData"><combobox>
+
+	<div class="buttons">
+		<button id="ok" class="ok">{Ok}</button>
+		<button id="cancel" class="cancel">{Cancel}</button>
+	</div>
+
+</form>

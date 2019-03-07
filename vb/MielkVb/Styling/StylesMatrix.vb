@@ -16,6 +16,7 @@ Public Class StylesMatrix
 
     Public Sub New(parent As IControl, Optional runLoadingStyles As Boolean = True)
         pParent = parent
+        pClassStyleSets = New List(Of StyleSet)
         pInlineStyle = New StyleSet(vbNullString, vbNullString, vbNullString)
         If runLoadingStyles Then LoadStyles()
     End Sub
@@ -45,12 +46,19 @@ Public Class StylesMatrix
         pIdStyleSet = pParent.GetStylesManager().GetStyleByElementTag(tagName)
     End Sub
 
-    Private Sub addStyleSetToArray(styleSet As StyleSet)
-        If Not styleSet Is Nothing Then
-            If pClassStyleSets Is Nothing Then
-                pClassStyleSets.Add(styleSet)
+    Private Sub addStyleSetToArray(ParamArray styleSets() As StyleSet)
+        Dim styleSet As StyleSet
+        Dim somethingAdded As Boolean
+        '------------------------------------------------------------
+
+        For Each styleSet In styleSets
+            If Not styleSet Is Nothing Then
+                Call pClassStyleSets.Add(styleSet)
+                somethingAdded = True
             End If
-        End If
+        Next
+        If somethingAdded Then Call updatePropertiesArrayMap()
+
     End Sub
 
     Private Sub updatePropertiesArrayMap()
@@ -58,9 +66,9 @@ Public Class StylesMatrix
         Call Array.Clear(pPropertiesArraysMap, 0, pPropertiesArraysMap.Length)
         If Not pElementStyleSet Is Nothing Then Call applySingleStyleToPropertiesArray(pElementStyleSet)
 
-        'For Each styleSet In pClassStyleSets
-        '    Call applySingleStyleToPropertiesArray(styleSet)
-        'Next
+        For Each styleSet In pClassStyleSets
+            Call applySingleStyleToPropertiesArray(styleSet)
+        Next
 
         'If Not pIdStyleSet Is Nothing Then
         '    Call applySingleStyleToPropertiesArray(pIdStyleSet)
@@ -126,7 +134,7 @@ Public Class StylesMatrix
             Call setPropertyValue(nodeType, StylePropertyEnum.StyleProperty_ImageHeight, style.ImageHeight)
             Call setPropertyValue(nodeType, StylePropertyEnum.StyleProperty_ImageSize, style.ImageSize)
         Else
-            pPropertiesArraysMap(nodeType, 0) = False
+            pPropertiesArraysMap(nodeType, 0) = (pPropertiesArraysMap(nodeType, 0) Or False)
         End If
     End Sub
 
@@ -150,7 +158,14 @@ Public Class StylesMatrix
 #Region "Public methods"
 
     Public Sub AddStyleClass(className As String)
-        'GetStylesManager().GetStyleByElementAndClass(TAG_NAME, name)
+        Dim tagClassStyleSet As StyleSet
+        Dim classStyleSet As StyleSet
+        '------------------------------------------------------------
+        With GetStylesManager()
+            tagClassStyleSet = .GetStyleByElementAndClass(pParent.GetElementTag, className)
+            classStyleSet = .GetStyleByClassName(className)
+        End With
+        Call addStyleSetToArray(tagClassStyleSet, classStyleSet)
     End Sub
 
     Public Sub RemoveStyleClass(className As String)

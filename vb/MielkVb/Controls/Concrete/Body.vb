@@ -94,12 +94,12 @@ Public Class Body
 
 #Region "Managing children"
 
-    'Public Sub AddControl(ctrl As IControl)
-    '    Call ctrl.SetParent(Me)
-    '    Call pControls.Add(ctrl)
-    '    Call pControlsDict.Add(ctrl.GetId, ctrl)
-    '    Call Me.Controls.Add(ctrl)
-    'End Sub
+    Public Sub AddControl(ctrl As IControl)
+        Call ctrl.SetParent(pWindow)
+        Call pControls.Add(ctrl)
+        Call pControlsDict.Add(ctrl.GetId, ctrl)
+        Call Me.Controls.Add(ctrl)
+    End Sub
 
     'Public Sub RemoveControl(ctrl As Control)
 

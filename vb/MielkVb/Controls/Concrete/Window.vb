@@ -757,9 +757,9 @@ Public Class Window
         Me.Controls.Add(pBody)
     End Sub
 
-    'Public Sub AddControl(ctrl As Control)
-    '    Call pBody.AddControl(ctrl)
-    'End Sub
+    Public Sub AddControl(ctrl As IControl)
+        Call pBody.AddControl(ctrl)
+    End Sub
 
     'Public Sub RemoveControl(ctrl As Control)
     '    Call pBody.RemoveControl(ctrl)
@@ -784,14 +784,20 @@ Public Class Window
 
     Public Sub AddStyleClass(name As String) Implements IControl.AddStyleClass
         Call pStylesMatrix.AddStyleClass(name)
+        Call calculateProperties()
+        Call updateView()
     End Sub
 
     Public Sub RemoveStyleClass(name As String) Implements IControl.RemoveStyleClass
         Call pStylesMatrix.RemoveStyleClass(name)
+        Call calculateProperties()
+        Call updateView()
     End Sub
 
     Public Sub SetStyleProperty(propertyType As Long, value As Object) Implements IControl.SetStyleProperty
         Call pStylesMatrix.AddInlineStyle(propertyType, value)
+        Call calculateProperties()
+        Call updateView()
     End Sub
 
     Private Function calculateProperties() As Object
