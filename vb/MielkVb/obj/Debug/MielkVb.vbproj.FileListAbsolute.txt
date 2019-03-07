@@ -26,4 +26,3 @@ C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb\MielkVb\bin\Debug\MielkVb.x
 C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb\MielkVb\obj\Debug\MielkVb.exe
 C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb\MielkVb\obj\Debug\MielkVb.xml
 C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb\MielkVb\obj\Debug\MielkVb.pdb
-C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb\MielkVb\obj\Debug\MielkVb.Form2.resources

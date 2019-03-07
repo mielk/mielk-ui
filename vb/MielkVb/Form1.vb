@@ -8,6 +8,8 @@ Public Class Form1
 
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'Me.Label1.BackColor = Color.Transparent
+        'Me.Label1.Parent = Me.Panel1
         'Call testHtml()
         'Call testTransparentFrame()
     End Sub
@@ -88,12 +90,52 @@ Public Class Form1
 
     'End Sub
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        Dim form As Window
-        form = New Window
-        form.Show()
-        form.ControlBox = False
-        form.Text = String.Empty
-        form.FormBorderStyle = FormBorderStyle.None
+
+    Private Sub x(sender As Object, e As EventArgs) Handles Me.Click
+        Dim panel As TransparentPanel
+        panel = New TransparentPanel
+        'Dim panel As Panel
+        'panel = New Panel
+        panel.BackColor = colorFromString("rgb(230, 230, 230)")
+
+        panel.Opacity = 75
+        panel.Width = 500
+        panel.Height = 500
+        panel.setText("testowy tekst")
+
+        Me.Controls.Add(panel)
+        panel.BringToFront()
+
+
+        Dim label As Label
+        label = New Label
+        label.BackColor = Color.Transparent
+        'label.Parent = panel
+        label.Text = "text"
+        label.Font = New Font("Century Gothic", 13, FontStyle.Bold)
+        label.Top = 220
+        label.Left = 250
+        Call panel.Controls.Add(label)
+
+
+        'Dim form As TransparentWindow
+        'form = New TransparentWindow
+        'form.ControlBox = False
+        'form.Text = String.Empty
+        'form.FormBorderStyle = FormBorderStyle.None
+
+        'Dim lbl As Label
+        'lbl = New Label
+        'lbl.Text = "test"
+        'lbl.Size = New Size(200, 100)
+        'lbl.Left = 100
+        'lbl.Top = 150
+        'Call form.Controls.Add(lbl)
+        'form.ShowInTaskbar = False
+
+        'form.TopMost = True
+        'Call form.updateOpacity(120, True)
+        'form.Show()
     End Sub
+
 End Class
