@@ -12,9 +12,13 @@ Public Interface IControl
     Function GetId() As String
     Function GetElementTag() As String
     Sub SetParent(parent As IContainer)
+    Function GetParent() As IContainer
+    Function GetWindow() As Window
 
     '[Size and position]
     Sub UpdateSizeAndPosition(Optional ByRef anyChanges As Boolean = False)
+    Function GetWidth() As Single
+    Function GetHeight() As Single
 
     ''[Setting inline properties]
     'Sub SetTop(value As VariantType?)

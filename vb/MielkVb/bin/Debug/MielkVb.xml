@@ -6,38 +6,7 @@ MielkVb
 </name>
 </assembly>
 <members>
-<member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.Invalidate">
-	<summary>
- Invalidates the rectangle or region that you specify in lprcUpdate or hrgnUpdate.
- You can set only one of these parameters to a non-NULL value. If both are NULL, RDW_INVALIDATE invalidates the entire window.
- </summary>
-</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.InternalPaint">
-	<summary>Causes the OS to post a WM_PAINT message to the window regardless of whether a portion of the window is invalid.</summary>
-</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.Erase">
-	<summary>
- Causes the window to receive a WM_ERASEBKGND message when the window is repainted.
- Specify this value in combination with the RDW_INVALIDATE value; otherwise, RDW_ERASE has no effect.
- </summary>
-</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.Validate">
-	<summary>
- Validates the rectangle or region that you specify in lprcUpdate or hrgnUpdate.
- You can set only one of these parameters to a non-NULL value. If both are NULL, RDW_VALIDATE validates the entire window.
- This value does not affect internal WM_PAINT messages.
- </summary>
-</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.NoErase">
-	<summary>Suppresses any pending WM_ERASEBKGND messages.</summary>
-</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.NoChildren">
-	<summary>Excludes child windows, if any, from the repainting operation.</summary>
-</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.AllChildren">
-	<summary>Includes child windows, if any, in the repainting operation.</summary>
-</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.UpdateNow">
-	<summary>Causes the affected windows, which you specify by setting the RDW_ALLCHILDREN and RDW_NOCHILDREN values, to receive WM_ERASEBKGND and WM_PAINT messages before the RedrawWindow returns, if necessary.</summary>
-</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.EraseNow">
-	<summary>
- Causes the affected windows, which you specify by setting the RDW_ALLCHILDREN and RDW_NOCHILDREN values, to receive WM_ERASEBKGND messages before RedrawWindow returns, if necessary.
- The affected windows receive WM_PAINT messages at the ordinary time.
- </summary>
-</member><member name="P:MielkVb.My.Resources.Resources.ResourceManager">
+<member name="P:MielkVb.My.Resources.Resources.ResourceManager">
 	<summary>
   Returns the cached ResourceManager instance used by this class.
 </summary>
@@ -117,6 +86,37 @@ MielkVb
 		<b>Windows 2000/XP:</b> Minimizes a window, even if the thread 
  that owns the window is not responding. This flag should only be 
  used when minimizing windows from a different thread.
+ </summary>
+</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.Invalidate">
+	<summary>
+ Invalidates the rectangle or region that you specify in lprcUpdate or hrgnUpdate.
+ You can set only one of these parameters to a non-NULL value. If both are NULL, RDW_INVALIDATE invalidates the entire window.
+ </summary>
+</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.InternalPaint">
+	<summary>Causes the OS to post a WM_PAINT message to the window regardless of whether a portion of the window is invalid.</summary>
+</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.Erase">
+	<summary>
+ Causes the window to receive a WM_ERASEBKGND message when the window is repainted.
+ Specify this value in combination with the RDW_INVALIDATE value; otherwise, RDW_ERASE has no effect.
+ </summary>
+</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.Validate">
+	<summary>
+ Validates the rectangle or region that you specify in lprcUpdate or hrgnUpdate.
+ You can set only one of these parameters to a non-NULL value. If both are NULL, RDW_VALIDATE validates the entire window.
+ This value does not affect internal WM_PAINT messages.
+ </summary>
+</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.NoErase">
+	<summary>Suppresses any pending WM_ERASEBKGND messages.</summary>
+</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.NoChildren">
+	<summary>Excludes child windows, if any, from the repainting operation.</summary>
+</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.AllChildren">
+	<summary>Includes child windows, if any, in the repainting operation.</summary>
+</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.UpdateNow">
+	<summary>Causes the affected windows, which you specify by setting the RDW_ALLCHILDREN and RDW_NOCHILDREN values, to receive WM_ERASEBKGND and WM_PAINT messages before the RedrawWindow returns, if necessary.</summary>
+</member><member name="F:MielkVb.TransparentWindow.RedrawWindowFlags.EraseNow">
+	<summary>
+ Causes the affected windows, which you specify by setting the RDW_ALLCHILDREN and RDW_NOCHILDREN values, to receive WM_ERASEBKGND messages before RedrawWindow returns, if necessary.
+ The affected windows receive WM_PAINT messages at the ordinary time.
  </summary>
 </member>
 </members>

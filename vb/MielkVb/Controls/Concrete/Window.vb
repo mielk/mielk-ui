@@ -134,6 +134,7 @@ Public Class Window
 
     '[Controls]
     Private pBody As Body
+    'Private pImageList As ImageList
 
     '[State]
     Private pIsDisplayed As Boolean
@@ -154,6 +155,19 @@ Public Class Window
         pHandle = Me.Handle
         Call CreateBody()
         pStylesMatrix = New StylesMatrix(Me, False)
+        'pImageList = New ImageList
+        'pImageList.ImageSize = New Size(16, 16)
+    End Sub
+
+    Private Sub InitializeComponent()
+        Me.SuspendLayout()
+        '
+        'Window
+        '
+        Me.ClientSize = New System.Drawing.Size(284, 261)
+        Me.Name = "Window"
+        Me.ResumeLayout(False)
+
     End Sub
 
 #End Region
@@ -261,10 +275,22 @@ Public Class Window
         End If
     End Sub
 
+    Public Sub SetIcon(ByVal path As String)
+        Me.Icon = New System.Drawing.Icon(path)
+    End Sub
+
 #End Region
 
 
 #Region "Window properties - Getters"
+
+    Public Function GetParent() As IContainer Implements IContainer.GetParent, IControl.GetParent
+        Return Nothing
+    End Function
+
+    Public Function GetWindow() As Window Implements IContainer.GetWindow, IControl.GetWindow
+        Return Me
+    End Function
 
     Public Function GetId() As String Implements IControl.GetId
         Return pId
@@ -309,123 +335,6 @@ Public Class Window
 #End Region
 
 
-
-
-    '#Region "UI properties - Setters"
-
-
-    '    '[Position]
-    '    Public Sub SetTop(value As Object, Optional redraw As Boolean = True)
-    '        Call pStylesMatrix.AddInlineStyle(StylePropertyEnum.StyleProperty_Top, value)
-    '        If redraw Then updatePosition()
-    '    End Sub
-
-    '    Public Sub SetLeft(value As Object, Optional redraw As Boolean = True)
-    '        Call pStylesMatrix.AddInlineStyle(StylePropertyEnum.StyleProperty_Left, value)
-    '        If redraw Then updatePosition()
-    '    End Sub
-
-    '    Public Sub SetBottom(value As Object, Optional redraw As Boolean = True)
-    '        Call pStylesMatrix.AddInlineStyle(StylePropertyEnum.StyleProperty_Bottom, value)
-    '        If redraw Then updatePosition()
-    '        'pBottom = value
-    '        'pTop = Single.NaN
-    '        'Call updatePosition()
-    '    End Sub
-
-    '    Public Sub SetRight(value As Single)
-    '        'pRight = value
-    '        'pLeft = Single.NaN
-    '        'Call updatePosition()
-    '    End Sub
-
-
-    '    '[Size]
-    '    Public Sub SetWidth(value As Single)
-    '        'pWidth = value
-    '        'Call updateSizeAndPosition()
-    '    End Sub
-
-    '    Public Sub SetAutoWidth(value As Boolean)
-    '        'pAutoWidth = value
-    '        'If pAutoWidth Then
-    '        '    pWidth = Single.NaN
-    '        'Else
-    '        '    pWidth = Me.Width
-    '        'End If
-    '        'Call updateSizeAndPosition()
-    '    End Sub
-
-    '    Public Sub SetHeight(value As Single)
-    '        'pHeight = value
-    '        'pAutoHeight = False
-    '        'Call updateSizeAndPosition()
-    '    End Sub
-
-    '    Public Sub SetAutoHeight(value As Boolean)
-    '        'pAutoHeight = value
-    '        'If pAutoHeight Then
-    '        '    pHeight = Single.NaN
-    '        'Else
-    '        '    pHeight = Me.Height
-    '        'End If
-    '        'Call updateSizeAndPosition()
-    '    End Sub
-
-
-
-
-
-    '    '[Paddings]
-    '    Public Sub SetPaddings(ByVal value As Single)
-    '        'pPaddingTop = value
-    '        'pPaddingRight = value
-    '        'pPaddingBottom = value
-    '        'pPaddingLeft = value
-    '        'Call updateSizeAndPosition()
-    '    End Sub
-
-    '    Public Sub SetPaddingTop(value As Single)
-    '        'pPaddingTop = value
-    '        'Call updateSizeAndPosition()
-    '    End Sub
-
-    '    Public Sub SetPaddingRight(value As Single)
-    '        'pPaddingRight = value
-    '        'Call updateSizeAndPosition()
-    '    End Sub
-
-    '    Public Sub SetPaddingBottom(value As Single)
-    '        'pPaddingBottom = value
-    '        'Call updateSizeAndPosition()
-    '    End Sub
-
-    '    Public Sub SetPaddingLeft(value As Single)
-    '        'pPaddingLeft = value
-    '        'Call updateSizeAndPosition()
-    '    End Sub
-
-
-
-    '    '[Background]
-    '    Public Sub SetBackgroundColorByNumeric(value As Long, Optional opacity As Single = 1)
-    '        Dim blue As Long = value \ 65536
-    '        Dim green As Long = (value - blue * 65536) \ 256
-    '        Dim red As Long = value - blue * 65536 - green * 256
-    '        Dim color As Color
-    '        '------------------------------------------------------------------------------------------------------------------------------------------------------------
-    '        color = System.Drawing.Color.FromArgb(Math.Max(Math.Min(opacity * 255, 255), 0), red, green, blue)
-    '        'Me.BackColor = pBackgroundColor
-    '    End Sub
-
-    '    Public Sub SetBackgroundColorByRgb(color As String, Optional opacity As Single = 1)
-    '        'Me.BackColor = pBackgroundColor
-    '    End Sub
-
-
-    '#End Region
-
-
 #Region "UI properties - Getters"
 
     '[Position]
@@ -445,13 +354,22 @@ Public Class Window
         Return Me.Right
     End Function
 
-    Public Function GetWidth() As Single
-        Return Me.Width
+    Public Function GetWidth() As Single Implements IContainer.GetWidth, IControl.GetWidth
+        Return Me.ClientSize.Width
     End Function
 
-    Public Function GetHeight() As Single
-        Return Me.Height
+    Public Function GetInnerWidth() As Single Implements IContainer.GetInnerWidth
+        Return Me.ClientSize.Width - GetPaddingsWidth()
     End Function
+
+    Public Function GetHeight() As Single Implements IContainer.GetHeight, IControl.GetHeight
+        Return Me.ClientSize.Height
+    End Function
+
+    Public Function GetInnerHeight() As Single Implements IContainer.GetInnerHeight
+        Return Me.ClientSize.Height - GetPaddingsHeight()
+    End Function
+
 
 
     '[Borders]
@@ -477,20 +395,20 @@ Public Class Window
         Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingLeft) + pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingRight)
     End Function
 
-    Public Function GetPaddingTop() As Single
-        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingTop)
+    Public Function GetPaddingLeft() As Single Implements IContainer.GetPaddingLeft
+        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingLeft)
     End Function
 
-    Public Function GetPaddingRight() As Single
+    Public Function GetPaddingRight() As Single Implements IContainer.GetPaddingRight
         Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingRight)
     End Function
 
-    Public Function GetPaddingBottom() As Single
-        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingBottom)
+    Public Function GetPaddingTop() As Single Implements IContainer.GetPaddingTop
+        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingTop)
     End Function
 
-    Public Function GetPaddingLeft() As Single
-        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingLeft)
+    Public Function GetPaddingBottom() As Single Implements IContainer.GetPaddingBottom
+        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingBottom)
     End Function
 
     Public Function GetBodyWidth() As Single
@@ -502,7 +420,6 @@ Public Class Window
     End Function
 
 #End Region
-
 
 
 #Region "Rendering"
@@ -668,14 +585,13 @@ Public Class Window
         End If
     End Sub
 
-    Private Sub rearrangeControls()
+    Public Sub RearrangeControls() Implements IContainer.RearrangeControls
         If Not pBody Is Nothing Then
             Call pBody.updateSizeAndPosition()
         End If
     End Sub
 
 #End Region
-
 
 
 #Region "Events"
@@ -736,18 +652,6 @@ Public Class Window
     End Sub
 
 #End Region
-
-
-    Private Sub InitializeComponent()
-        Me.SuspendLayout()
-        '
-        'Window
-        '
-        Me.ClientSize = New System.Drawing.Size(284, 261)
-        Me.Name = "Window"
-        Me.ResumeLayout(False)
-
-    End Sub
 
 
 #Region "Managing children"
@@ -830,6 +734,21 @@ Public Class Window
         pState = StyleNodeTypeEnum.StyleNodeType_Normal
         Call updateView()
     End Sub
+
+#End Region
+
+
+#Region "Images"
+
+    Public Sub AddImage(key As String, filepath As String)
+        Dim image As Image
+        image = Bitmap.FromFile(filepath)
+        'Call pImageList.Images.Add(key, image)
+    End Sub
+
+    Public Function GetImageList() As ImageList
+        'Return pImageList
+    End Function
 
 #End Region
 

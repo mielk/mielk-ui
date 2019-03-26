@@ -19,3 +19,13 @@ C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\VB.NET project\MielkUI\Mielk
 C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\VB.NET project\MielkUI\MielkUI\obj\Debug\MielkUI.dll
 C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\VB.NET project\MielkUI\MielkUI\obj\Debug\MielkUI.xml
 C:\Users\Tomek\Dropbox\tm\mielk\Mielk.Core\mielk-ui\VB.NET project\MielkUI\MielkUI\obj\Debug\MielkUI.pdb
+C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb-external-lib\MielkUI\MielkUI\bin\Debug\MielkUI.dll
+C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb-external-lib\MielkUI\MielkUI\bin\Debug\MielkUI.pdb
+C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb-external-lib\MielkUI\MielkUI\bin\Debug\MielkUI.xml
+C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb-external-lib\MielkUI\MielkUI\obj\Debug\MielkUI.TransparentWindow.resources
+C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb-external-lib\MielkUI\MielkUI\obj\Debug\MielkUI.Window.resources
+C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb-external-lib\MielkUI\MielkUI\obj\Debug\MielkUI.Resources.resources
+C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb-external-lib\MielkUI\MielkUI\obj\Debug\MielkUI.vbproj.GenerateResource.Cache
+C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb-external-lib\MielkUI\MielkUI\obj\Debug\MielkUI.dll
+C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb-external-lib\MielkUI\MielkUI\obj\Debug\MielkUI.xml
+C:\Users\Tomek\Dropbox\tm\mielk\mielk-ui\mielk-ui\vb-external-lib\MielkUI\MielkUI\obj\Debug\MielkUI.pdb

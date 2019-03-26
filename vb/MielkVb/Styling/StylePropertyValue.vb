@@ -4,7 +4,7 @@ Public Class StylePropertyValue
     Private pIsNull As Boolean
     Private pIsInherited As Boolean
     Private pIsAuto As Boolean
-    Private pCssValue As String
+    Private pCssValue As Object
     Private pRealValue As Object
 
 #Region "Constructors"
@@ -34,8 +34,8 @@ Public Class StylePropertyValue
 
     End Sub
 
-    Public Sub New(value As String)
-        pCssValue = value
+    Public Sub New(value As Object)
+        CssValue = value
     End Sub
 
 #End Region
@@ -76,6 +76,7 @@ Public Class StylePropertyValue
         End Get
         Set(v As Object)
             pCssValue = v
+            pRealValue = v
         End Set
     End Property
 

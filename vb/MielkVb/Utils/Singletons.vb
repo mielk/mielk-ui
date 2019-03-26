@@ -9,5 +9,12 @@
         Return instance
     End Function
 
+    Public Function GetTranslation(tag As String) As String
+        Select Case tag
+            Case "Ok" : Return "OK"
+            Case "Cancel" : Return "Cancel"
+            Case Else : Return "[Unknown]"
+        End Select
+    End Function
 
 End Module

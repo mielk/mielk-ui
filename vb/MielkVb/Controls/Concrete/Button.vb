@@ -2,14 +2,14 @@
 Imports System.Runtime.InteropServices
 Imports System.Drawing
 
-Public Class Div
-    Inherits System.Windows.Forms.Panel
-    Implements IContainer, IControl
+Public Class Button
+    Inherits System.Windows.Forms.Button
+    Implements IControl
 
 
 #Region "Private variables"
 
-    Private Const TAG_NAME As String = "div"
+    Private Const TAG_NAME As String = "button"
 
     '[Main properties]
     Private pParent As IContainer
@@ -17,22 +17,19 @@ Public Class Div
     Private pListener As Object
     Private pHandle As IntPtr
     Private pId As String
-
-    '[Controls]
-    Private pControls As Collection
-    Private pControlsDict As Dictionary(Of String, IControl)
+    Private pCaption As String
 
     '[Style]
     Private pStylesMatrix As StylesMatrix
     Private pCurrentProperties(0 To CountStylePropertiesEnums()) As Object
+    Private pImageList As ImageList
 
     '[State]
     Private pIsRendered As Boolean
     Private pState As StyleNodeTypeEnum
 
-    '[Borders]
-    Private pBorderThickness As Single
-    Private pBorderColor As Color
+    '[Border]
+    Private pShowBorder As Boolean
 
 #End Region
 
@@ -40,23 +37,20 @@ Public Class Div
 #Region "Constructor"
 
     Public Sub New(parent As IContainer, id As String)
-        Me.BorderStyle = Windows.Forms.BorderStyle.None
         pId = id
         pParent = parent
-        pWindow = pParent.GetWindow
+        pWindow = parent.GetWindow
         pHandle = Me.Handle
-        pControls = New Collection
-        pControlsDict = New Dictionary(Of String, IControl)
         pStylesMatrix = New StylesMatrix(Me)
+        Call overrideDefaultStyle()
     End Sub
 
-#End Region
-
-
-#Region "Custom borders"
-    Public Overridable Sub MyPanel_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles Me.Paint
-        e.Graphics.DrawRectangle(New Pen(pBorderColor, 2 * pBorderThickness), Me.ClientRectangle)
+    Private Sub overrideDefaultStyle()
+        Me.FlatStyle = Windows.Forms.FlatStyle.Flat
+        Me.Cursor = Cursors.Hand
+        'FlatAppearance.BorderColor = Color.FromArgb(51, 153, 255)
     End Sub
+
 #End Region
 
 
@@ -71,16 +65,21 @@ Public Class Div
         pParent = parent
     End Sub
 
+    Public Sub SetCaption(value As String)
+        pCaption = value
+        Me.Text = pCaption
+    End Sub
+
 #End Region
 
 
 #Region "Getters"
 
-    Public Function GetParent() As IContainer Implements IContainer.GetParent, IControl.GetParent
+    Public Function GetParent() As IContainer Implements IControl.GetParent
         Return pParent
     End Function
 
-    Public Function GetWindow() As Window Implements IContainer.GetWindow, IControl.GetWindow
+    Public Function GetWindow() As Window Implements IControl.GetWindow
         Return pWindow
     End Function
 
@@ -92,110 +91,13 @@ Public Class Div
         Return TAG_NAME
     End Function
 
-    'Public Function GetBorderBox() As Boolean
-    '    Return pBorderBox
-    'End Function
-
-    'Public Function GetTop() As Single
-    '    Return Me.Top
-    'End Function
-
-    'Public Function GetBottom() As Single
-    '    Return Me.Bottom
-    'End Function
-
-    'Public Function GetLeft() As Single
-    '    Return Me.Left
-    'End Function
-
-    'Public Function GetRight() As Single
-    '    Return Me.Right
-    'End Function
-
-
-
-    Public Function GetWidth() As Single Implements IContainer.GetWidth, IControl.GetWidth
+    Public Function GetWidth() As Single Implements IControl.GetWidth
         Return Me.Width
     End Function
 
-    Public Function GetInnerWidth() As Single Implements IContainer.GetInnerWidth
-        Return Me.Width - getPaddingsWidth()
-    End Function
-
-    Public Function GetHeight() As Single Implements IContainer.GetHeight, IControl.GetHeight
+    Public Function GetHeight() As Single Implements IControl.GetHeight
         Return Me.Height
     End Function
-
-    Public Function GetInnerHeight() As Single Implements IContainer.GetInnerHeight
-        Return Me.Height - getPaddingsHeight()
-    End Function
-
-    Public Function GetPaddingLeft() As Single Implements IContainer.GetPaddingLeft
-        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingLeft)
-    End Function
-
-    Public Function GetPaddingRight() As Single Implements IContainer.GetPaddingRight
-        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingRight)
-    End Function
-
-    Public Function GetPaddingTop() As Single Implements IContainer.GetPaddingTop
-        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingTop)
-    End Function
-
-    Public Function GetPaddingBottom() As Single Implements IContainer.GetPaddingBottom
-        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingBottom)
-    End Function
-
-    Private Function getPaddingsWidth() As Single
-        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingLeft) + pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingRight)
-    End Function
-
-    Private Function getPaddingsHeight() As Single
-        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingTop) + pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingBottom)
-    End Function
-
-
-
-
-    ''[Background & borders]
-    'Public Function GetBackgroundColor() As Color
-    '    Return pBackgroundColor
-    'End Function
-
-    'Public Function GetBorderThickness() As Long
-    '    Return pBorderThickness
-    'End Function
-
-    'Public Function GetBorderColor() As Color
-    '    Return pBorderColor
-    'End Function
-
-
-
-    ''[Margin and paddings]
-    'Public Function GetMarginsHeight() As Single
-    '    Return pMarginBottom + pMarginTop
-    'End Function
-
-    'Public Function GetMarginsWidth() As Single
-    '    Return pMarginLeft + pMarginRight
-    'End Function
-
-    'Public Function GetMarginTop() As Single
-    '    Return pMarginTop
-    'End Function
-
-    'Public Function GetMarginRighe() As Single
-    '    Return pMarginRight
-    'End Function
-
-    'Public Function GetMarginBottom() As Single
-    '    Return pMarginBottom
-    'End Function
-
-    'Public Function GetMarginLeft() As Single
-    '    Return pMarginLeft
-    'End Function
 
 #End Region
 
@@ -209,10 +111,10 @@ Public Class Div
         '---------------------------------------------------------------------------------------------------------
         Dim sizeChanged As Boolean = False                  'size of this element and therefore size and layout of children elements
         Dim positionChanged As Boolean = False              'position on the screen
-        Dim insideLayoutChanged As Boolean = False          'properties that can affect layout of children elements
         Dim outsideLayoutChanged As Boolean = False         'properties that can affect layout of siblings elements
         Dim bordersChanged As Boolean = False               'borders
         Dim insidePropertiesChanged As Boolean = False      'i.e. background, font color - properties that doesn't affect any other controls.
+        Dim imageChanged As Boolean = False
         '---------------------------------------------------------------------------------------------------------
 
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_Float, newProperties(StylePropertyEnum.StyleProperty_Float), positionChanged)
@@ -228,11 +130,11 @@ Public Class Div
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_Height, newProperties(StylePropertyEnum.StyleProperty_Height), sizeChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_MinHeight, newProperties(StylePropertyEnum.StyleProperty_MinHeight), sizeChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_MaxHeight, newProperties(StylePropertyEnum.StyleProperty_MaxHeight), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Padding, newProperties(StylePropertyEnum.StyleProperty_Padding), insideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingTop, newProperties(StylePropertyEnum.StyleProperty_PaddingTop), insideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingLeft, newProperties(StylePropertyEnum.StyleProperty_PaddingLeft), insideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingBottom, newProperties(StylePropertyEnum.StyleProperty_PaddingBottom), insideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingRight, newProperties(StylePropertyEnum.StyleProperty_PaddingRight), insideLayoutChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Padding, newProperties(StylePropertyEnum.StyleProperty_Padding), insidePropertiesChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingTop, newProperties(StylePropertyEnum.StyleProperty_PaddingTop), insidePropertiesChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingLeft, newProperties(StylePropertyEnum.StyleProperty_PaddingLeft), insidePropertiesChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingBottom, newProperties(StylePropertyEnum.StyleProperty_PaddingBottom), insidePropertiesChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingRight, newProperties(StylePropertyEnum.StyleProperty_PaddingRight), insidePropertiesChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_Margin, newProperties(StylePropertyEnum.StyleProperty_Margin), outsideLayoutChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginTop, newProperties(StylePropertyEnum.StyleProperty_MarginTop), outsideLayoutChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginLeft, newProperties(StylePropertyEnum.StyleProperty_MarginLeft), outsideLayoutChanged)
@@ -247,18 +149,18 @@ Public Class Div
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_FontBold, newProperties(StylePropertyEnum.StyleProperty_FontBold), insidePropertiesChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_HorizontalAlignment, newProperties(StylePropertyEnum.StyleProperty_HorizontalAlignment), insidePropertiesChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_VerticalAlignment, newProperties(StylePropertyEnum.StyleProperty_VerticalAlignment), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageFilePath, newProperties(StylePropertyEnum.StyleProperty_ImageFilePath), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageName, newProperties(StylePropertyEnum.StyleProperty_ImageName), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageWidth, newProperties(StylePropertyEnum.StyleProperty_ImageWidth), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageHeight, newProperties(StylePropertyEnum.StyleProperty_ImageHeight), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageSize, newProperties(StylePropertyEnum.StyleProperty_ImageSize), insidePropertiesChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageFilePath, newProperties(StylePropertyEnum.StyleProperty_ImageFilePath), imageChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageName, newProperties(StylePropertyEnum.StyleProperty_ImageName), imageChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageWidth, newProperties(StylePropertyEnum.StyleProperty_ImageWidth), imageChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageHeight, newProperties(StylePropertyEnum.StyleProperty_ImageHeight), imageChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageSize, newProperties(StylePropertyEnum.StyleProperty_ImageSize), imageChanged)
 
         If insidePropertiesChanged Then Call updateInsideProperties()
+        If imageChanged Then Call updateImage()
         If bordersChanged Then Call updateBorders()
-        If sizeChanged Then Call updateSize(insideLayoutChanged)
+        If sizeChanged Then Call updateSize(outsideLayoutChanged)
         If positionChanged Then Call updatePosition(outsideLayoutChanged)
-        If outsideLayoutChanged Or insideLayoutChanged Then Call pParent.RearrangeControls()
-        If insideLayoutChanged And Not sizeChanged Then rearrangeControls()
+        If outsideLayoutChanged Then Call pParent.RearrangeControls()
 
     End Sub
 
@@ -274,8 +176,7 @@ Public Class Div
 
     Public Sub UpdateSizeAndPosition(Optional ByRef anyChanges As Boolean = False) Implements IControl.UpdateSizeAndPosition
         Call updateSize(anyChanges)
-        Call updatePosition()
-        If anyChanges Then Call rearrangeControls()
+        Call updatePosition(anyChanges)
     End Sub
 
     Private Sub updateSize(Optional ByRef anyChanges As Boolean = False)
@@ -296,20 +197,12 @@ Public Class Div
     End Sub
 
     Private Sub updatePosition(Optional ByRef anyChanges As Boolean = False)
-        Dim left As Single : left = CalculateControlLeft(Me, pParent, pCurrentProperties)
-        Dim top As Single : top = CalculateControlTop(Me, pParent, pCurrentProperties)
-        '------------------------------------------------------------------------------------------------------------------------------------------------------------
+        If pCurrentProperties(StylePropertyEnum.StyleProperty_Position) = CssPositionEnum.CssPosition_Absolute Then
+            Me.Left = calculateLeft()
+            Me.Top = calculateTop()
+        Else
 
-        If left <> Me.Left Then
-            anyChanges = True
-            Me.Left = left
         End If
-
-        If top <> Me.Top Then
-            anyChanges = True
-            Me.Top = top
-        End If
-
     End Sub
 
     Private Function calculateLeft() As Single
@@ -357,19 +250,75 @@ Public Class Div
     End Function
 
     Private Sub updateInsideProperties()
-        Me.BackColor = pCurrentProperties(StylePropertyEnum.StyleProperty_BackgroundColor)
+        Me.Font = createFont()
+        Me.ForeColor = pCurrentProperties(StylePropertyEnum.StyleProperty_FontColor)
+        Call updateBackColor()
     End Sub
+
+    Private Sub updateBackColor()
+        Dim normalBackColor As Object : normalBackColor = If(pCurrentProperties(StylePropertyEnum.StyleProperty_BackgroundColor), Color.Transparent)
+        Dim hoverBackColor As Object : hoverBackColor = pStylesMatrix.GetPropertyValue(StylePropertyEnum.StyleProperty_BackgroundColor, StyleNodeTypeEnum.StyleNodeType_Hover)
+        Dim clickedBackColor As Object : clickedBackColor = pStylesMatrix.GetPropertyValue(StylePropertyEnum.StyleProperty_BackgroundColor, StyleNodeTypeEnum.StyleNodeType_Clicked)
+        '------------------------------------------------------------------------------------------------------------------------------------------------------------
+        Me.BackColor = normalBackColor
+        With Me.FlatAppearance
+            .MouseDownBackColor = If(clickedBackColor, normalBackColor)
+            .MouseOverBackColor = If(hoverBackColor, normalBackColor)
+        End With
+    End Sub
+
+    Private Sub updateImage()
+        Const DEFAULT_IMAGE_SIZE As Single = 16
+        '------------------------------------------------------------------------------------------------------------------------------------------------------------
+        Dim imageFilePath As Object
+        Dim imageWidth As Object
+        Dim imageHeight As Object
+        '------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        imageFilePath = pCurrentProperties(StylePropertyEnum.StyleProperty_ImageFilePath)
+        imageWidth = If(pCurrentProperties(StylePropertyEnum.StyleProperty_ImageWidth), DEFAULT_IMAGE_SIZE)
+        imageHeight = If(pCurrentProperties(StylePropertyEnum.StyleProperty_ImageHeight), DEFAULT_IMAGE_SIZE)
+
+        If Not imageFilePath Is Nothing Then
+            If pImageList Is Nothing Then pImageList = New ImageList
+            pImageList.ImageSize = New Size(imageWidth, imageHeight)
+            Call pImageList.Images.Add(Bitmap.FromFile(imageFilePath))
+            Me.ImageList = pImageList
+            Me.ImageIndex = 1
+            Me.TextImageRelation = TextImageRelation.ImageBeforeText
+            Me.TextAlign = ContentAlignment.MiddleRight
+            Me.Text = " " & pCaption
+        Else
+            Me.ImageList = Nothing
+            Me.TextAlign = ContentAlignment.MiddleCenter
+            Me.Text = pCaption
+        End If
+
+    End Sub
+
+    Private Function createFont() As Font
+        Dim bold As System.Drawing.FontStyle
+        Dim family As String
+        Dim size As Single
+        '------------------------------------------------------------------------------------------------------------------------------------------------------------
+        bold = IIf(pCurrentProperties(StylePropertyEnum.StyleProperty_FontBold), FontStyle.Bold, FontStyle.Regular)
+        family = pCurrentProperties(StylePropertyEnum.StyleProperty_FontFamily)
+        size = pCurrentProperties(StylePropertyEnum.StyleProperty_FontSize)
+        Return New Font(family, size, bold)
+    End Function
 
     Private Sub updateBorders()
-        pBorderThickness = If(pCurrentProperties(StylePropertyEnum.StyleProperty_BorderThickness), 0)
-        pBorderColor = If(pCurrentProperties(StylePropertyEnum.StyleProperty_BorderColor), System.Drawing.Color.Transparent)
-    End Sub
-
-    Public Sub RearrangeControls() Implements IContainer.RearrangeControls
-        Dim ctrl As IControl
-        For Each ctrl In pControls
-            Call ctrl.UpdateSizeAndPosition()
-        Next
+        Dim thickness As Single
+        Dim color As Object
+        '------------------------------------------------------------------------------------------------------------------------------------------------------------
+        thickness = If(pCurrentProperties(StylePropertyEnum.StyleProperty_BorderThickness), 0)
+        If thickness Then
+            color = If(pCurrentProperties(StylePropertyEnum.StyleProperty_BorderColor), System.Drawing.Color.Transparent)
+            With Me.FlatAppearance
+                .BorderSize = thickness
+                .BorderColor = color
+            End With
+        End If
     End Sub
 
 #End Region
@@ -377,85 +326,52 @@ Public Class Div
 
 #Region "Events"
 
-    'Private Sub Window_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-    '    If Not pListener Is Nothing Then
-    '        On Error Resume Next
-    '        Call pListener.RaiseEvent_Load()
-    '    End If
-    'End Sub
-
-    'Private Sub Window_Disposed(sender As Object, e As EventArgs) Handles Me.Disposed
-    '    If Not pListener Is Nothing Then
-    '        On Error Resume Next
-    '        Call pListener.RaiseEvent_Disposed()
-    '    End If
-    'End Sub
-
-    'Private Sub Div_MouseEnter(sender As Object, e As EventArgs) Handles Me.MouseEnter
-    '    If Not pStylesMatrix Is Nothing Then
-    '        Dim color As Color
-    '        color = pStylesMatrix.getBackgroundColor(StyleNodeTypeEnum.StyleNodeType_Hover)
-    '        pBackgroundColor = color
-    '        Call updateBackground()
-    '    End If
-    'End Sub
-
-    'Private Sub Div_MouseLeave(sender As Object, e As EventArgs) Handles Me.MouseLeave
-    '    If Not pStylesMatrix Is Nothing Then
-    '        Dim color As Color
-    '        color = pStylesMatrix.getBackgroundColor(StyleNodeTypeEnum.StyleNodeType_Normal)
-    '        pBackgroundColor = color
-    '        Call updateBackground()
-    '    End If
-    'End Sub
-
-    Private Sub Div_MouseEnter(sender As Object, e As EventArgs) Handles Me.MouseEnter
+    Private Sub Button_GotFocus(sender As Object, e As EventArgs) Handles Me.GotFocus
+        Call NotifyDefault(False)
         Call hover()
     End Sub
 
-    Private Sub Div_MouseLeave(sender As Object, e As EventArgs) Handles Me.MouseLeave
+    Private Sub Button_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+        If e.KeyCode = Keys.Return Then
+            Call pListener.TriggerEvent("click")
+        End If
+    End Sub
+
+    Private Sub Button_LostFocus(sender As Object, e As EventArgs) Handles Me.LostFocus
         Call unhover()
     End Sub
 
-    Private Sub Div_Resize(sender As Object, e As EventArgs) Handles Me.Resize
-        Call Invalidate()
+    Private Sub Button_MouseEnter(sender As Object, e As EventArgs) Handles Me.MouseEnter
+        Call NotifyDefault(False)
+        Call hover()
     End Sub
 
+    Private Sub Button_MouseLeave(sender As Object, e As EventArgs) Handles Me.MouseLeave
+        Call unhover()
+    End Sub
 
-    'Private Sub Window_GotFocus(sender As Object, e As EventArgs) Handles Me.GotFocus
-    '    If Not pListener Is Nothing Then
-    '        On Error Resume Next
-    '        Call pListener.RaiseEvent_GotFocus()
-    '    End If
-    'End Sub
+    Private Sub Button_MouseUp(sender As Object, e As MouseEventArgs) Handles Me.MouseUp
+        If e.X >= 0 Then
+            If e.X <= Me.Width Then
+                If e.Y >= 0 Then
+                    If e.Y <= Me.Height Then
+                        Call pListener.TriggerEvent("click")
+                    End If
+                End If
+            End If
+        End If
+    End Sub
 
-    'Private Sub Window_LostFocus(sender As Object, e As EventArgs) Handles Me.LostFocus
-    '    If Not pListener Is Nothing Then
-    '        On Error Resume Next
-    '        Call pListener.RaiseEvent_LostFocus()
-    '    End If
-    'End Sub
-
-    'Private Sub Window_ResizeEnd(sender As Object, e As EventArgs) Handles Me.ResizeEnd
-    '    If Not pListener Is Nothing Then
-    '        On Error Resume Next
-    '        Call pListener.RaiseEvent_SizeChanged(Me.Width, Me.Height, Me.Left, Me.Top)
-    '    End If
-    'End Sub
-
-    'Private Sub Window_Scroll(sender As Object, e As ScrollEventArgs) Handles Me.Scroll
-    '    If Not pListener Is Nothing Then
-    '        On Error Resume Next
-    '        Call pListener.RaiseEvent_Scroll()
-    '    End If
-    'End Sub
+    Private Sub Button_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        Call Invalidate()
+    End Sub
 
 #End Region
 
 
 
 #Region "Styles - Global"
-    Public Function GetStylesManager() As StylesManager Implements IContainer.GetStylesManager, IControl.GetStylesManager
+    Public Function GetStylesManager() As StylesManager Implements IControl.GetStylesManager
         Static instance As StylesManager
         '------------------------------------------------------------
         If instance Is Nothing Then instance = pParent.GetStylesManager
@@ -489,29 +405,13 @@ Public Class Div
         '------------------------------------------------------------------------------------------------------------------------------------
 
         source = pStylesMatrix.GetPropertiesArray
-        col = IIf(pState = StyleNodeTypeEnum.StyleNodeType_Hover, StyleNodeTypeEnum.StyleNodeType_Hover, StyleNodeTypeEnum.StyleNodeType_Normal)
+        col = CInt(pState)
         For i = LBound(source, 2) To UBound(source, 2)
             result(i) = source(col, i)
         Next
         Return result
 
     End Function
-
-#End Region
-
-
-#Region "Managing children"
-
-    Public Sub AddControl(ctrl As IControl)
-        Call ctrl.SetParent(Me)
-        Call pControls.Add(ctrl)
-        Call pControlsDict.Add(ctrl.GetId, ctrl)
-        Call Me.Controls.Add(ctrl)
-    End Sub
-
-    Public Sub RemoveControl(ctrl As Control)
-
-    End Sub
 
 #End Region
 
@@ -527,6 +427,43 @@ Public Class Div
         pState = StyleNodeTypeEnum.StyleNodeType_Normal
         Call updateView()
     End Sub
+
+#End Region
+
+
+#Region "Customize focus behaviour"
+
+    Private Sub ButtonPaint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs)
+        Dim btn = DirectCast(sender, Button)
+        Using p As New Pen(Me.BackColor)
+            e.Graphics.DrawRectangle(p, 1, 1, btn.Width - 3, btn.Height - 3)
+        End Using
+    End Sub
+
+    Protected Overrides Sub OnMouseEnter(e As EventArgs)
+        MyBase.OnMouseEnter(e)
+        pShowBorder = True
+    End Sub
+
+    Protected Overrides Sub OnMouseLeave(e As EventArgs)
+        MyBase.OnMouseLeave(e)
+        pShowBorder = False
+    End Sub
+
+    Protected Overrides Sub OnPaint(pEvent As PaintEventArgs)
+        MyBase.OnPaint(pEvent)
+        If (DesignMode Or pShowBorder) Then
+            Dim pen As Pen = New Pen(FlatAppearance.BorderColor, 1)
+            Dim rectangle As Rectangle = New Rectangle(0, 0, Size.Width - 1, Size.Height - 1)
+            Call pEvent.Graphics.DrawRectangle(pen, rectangle)
+        End If
+    End Sub
+
+    Protected Overrides ReadOnly Property ShowFocusCues As Boolean
+        Get
+            Return False
+        End Get
+    End Property
 
 #End Region
 

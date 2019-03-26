@@ -8,9 +8,8 @@ Public Class Form1
 
 
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        'Me.Label1.BackColor = Color.Transparent
-        'Me.Label1.Parent = Me.Panel1
-        'Call testHtml()
+        'Me.Icon = New System.Drawing.Icon("C:\Users\Tomek\Desktop\mlmh.ico")
+        Call testHtml()
         'Call testTransparentFrame()
     End Sub
 
@@ -23,6 +22,7 @@ Public Class Form1
         Me.TextBox1.AutoSize = False
         Me.TextBox1.Size = New System.Drawing.Size(142, 87)
 
+        Call pWindow.SetIcon("C:\Users\Tomek\Desktop\testIcon.ico")
         Call pWindow.Display()
     End Sub
 
@@ -138,4 +138,15 @@ Public Class Form1
         'form.Show()
     End Sub
 
+    Private Sub Label1_Click(sender As Object, e As EventArgs) Handles Label1.Click, Label2.Click
+
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+
+    End Sub
+
+    Private Sub PictureBox1_Click(sender As Object, e As EventArgs)
+
+    End Sub
 End Class

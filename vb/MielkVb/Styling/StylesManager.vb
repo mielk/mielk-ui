@@ -105,15 +105,6 @@
         Return pElementStyleSets.Count
     End Function
 
-    Public Function getAllElementNames() As String
-        Dim v As Object
-        Dim x As String = vbNullString
-        For Each v In pElementStyleSets.Keys
-            x = x & v
-        Next
-        Return x
-    End Function
-
 #End Region
 
 End Class

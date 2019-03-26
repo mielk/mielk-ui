@@ -25,7 +25,7 @@ Public Class VbaStylesParser
 
         For i = LBound(items) To UBound(items)
             item = items(i)
-            If item.Length > 0 Then
+            If item.Trim().Length > 0 Then
                 openBracketPosition = item.IndexOf("{")
                 header = item.Substring(0, openBracketPosition).Trim
                 body = item.Substring(openBracketPosition + 1).Trim
@@ -71,8 +71,6 @@ Public Class VbaStylesParser
         Dim regex As Regex = New Regex(REGEX_PATTERN)
         Dim matches As Object
         Dim typeSymbol As String
-        Dim pos As Integer
-        Dim hasElement As Boolean
         '------------------------------------------------------------------------------------------------------
         Dim header As New VbaStylesHeader
         Dim openBracketPosition As Integer
@@ -99,7 +97,7 @@ Public Class VbaStylesParser
         Else
             matches = regex.Matches(text)
             If matches.Count Then
-                header.HeaderElement = matches(0).submatches(0)
+                header.HeaderElement = CStr(matches(0).Value).Replace(".", vbNullString)
                 header.HeaderClass = text.Replace(header.HeaderElement & ".", vbNullString)
             Else
                 header.HeaderElement = text.Trim

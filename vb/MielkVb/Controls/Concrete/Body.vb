@@ -46,6 +46,57 @@ Public Class Body
 #End Region
 
 
+#Region "Getters"
+
+    Public Function GetParent() As IContainer Implements IContainer.GetParent
+        Return pWindow
+    End Function
+
+    Public Function GetWindow() As Window Implements IContainer.GetWindow
+        Return pWindow
+    End Function
+
+    Public Function GetWidth() As Single Implements IContainer.GetWidth
+        Return Me.Width
+    End Function
+
+    Public Function GetInnerWidth() As Single Implements IContainer.GetInnerWidth
+        Return Me.Width - getPaddingsWidth()
+    End Function
+
+    Public Function GetHeight() As Single Implements IContainer.GetHeight
+        Return Me.Height
+    End Function
+
+    Public Function GetInnerHeight() As Single Implements IContainer.GetInnerHeight
+        Return Me.Height - getPaddingsHeight()
+    End Function
+
+    Public Function GetPaddingLeft() As Single Implements IContainer.GetPaddingLeft
+        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingLeft)
+    End Function
+
+    Public Function GetPaddingRight() As Single Implements IContainer.GetPaddingRight
+        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingRight)
+    End Function
+
+    Public Function GetPaddingTop() As Single Implements IContainer.GetPaddingTop
+        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingTop)
+    End Function
+
+    Public Function GetPaddingBottom() As Single Implements IContainer.GetPaddingBottom
+        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingBottom)
+    End Function
+
+    Private Function getPaddingsWidth() As Single
+        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingLeft) + pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingRight)
+    End Function
+
+    Private Function getPaddingsHeight() As Single
+        Return pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingTop) + pCurrentProperties(StylePropertyEnum.StyleProperty_PaddingBottom)
+    End Function
+
+#End Region
 
 
 #Region "Rendering"
@@ -73,8 +124,12 @@ Public Class Body
         'Me.BackColor = colorFromString("#CCCCCC")
     End Sub
 
-    Private Sub rearrangeControls()
-
+    Public Sub RearrangeControls() Implements IContainer.RearrangeControls
+        Dim ctrl As IControl
+        '------------------------------------------------------------
+        For Each ctrl In pControls
+            Call ctrl.UpdateSizeAndPosition()
+        Next
     End Sub
 
 #End Region

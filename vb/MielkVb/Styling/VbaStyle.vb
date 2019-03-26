@@ -169,11 +169,27 @@
     End Function
     Public Function setHorizontalAlignment(value As Object) As VbaStyle
         setHorizontalAlignment = Me
-        pHorizontalAlignment = value
+        If value.Equals(CSS_HORIZONTAL_ALIGNMENT_LEFT) Then
+            pHorizontalAlignment = CssHorizontalAlignment.CssHorizontalAlignment_Left
+        ElseIf value.Equals(CSS_HORIZONTAL_ALIGNMENT_RIGHT) Then
+            pHorizontalAlignment = CssHorizontalAlignment.CssHorizontalAlignment_Right
+        ElseIf value.Equals(CSS_HORIZONTAL_ALIGNMENT_CENTER) Then
+            pHorizontalAlignment = CssHorizontalAlignment.CssHorizontalAlignment_Center
+        Else
+            pHorizontalAlignment = CssHorizontalAlignment.CssHorizontalAlignment_Left
+        End If
     End Function
     Public Function setVerticalAlignment(value As Object) As VbaStyle
         setVerticalAlignment = Me
-        pVerticalAlignment = value
+        If value.Equals(CSS_VERTICAL_ALIGNMENT_MIDDLE) Then
+            pVerticalAlignment = CssVerticalAlignment.CssVerticalAlignment_Middle
+        ElseIf value.Equals(CSS_VERTICAL_ALIGNMENT_TOP) Then
+            pVerticalAlignment = CssVerticalAlignment.CssVerticalAlignment_Top
+        ElseIf value.Equals(CSS_VERTICAL_ALIGNMENT_BOTTOM) Then
+            pVerticalAlignment = CssVerticalAlignment.CssVerticalAlignment_Bottom
+        Else
+            pVerticalAlignment = CssVerticalAlignment.CssVerticalAlignment_Middle
+        End If
     End Function
     Public Function setMarginTop(value As Object) As VbaStyle
         setMarginTop = Me
@@ -209,7 +225,11 @@
     End Function
     Public Function setFloat(value As Object) As VbaStyle
         setFloat = Me
-        pFloat = value
+        If value.Equals(CSS_FLOAT_RIGHT) Then
+            pFloat = CssFloatEnum.CssFloat_Right
+        Else
+            pFloat = CssFloatEnum.CssFloat_Left
+        End If
     End Function
     Public Function setBorderBox(value As Object) As VbaStyle
         setBorderBox = Me
@@ -217,7 +237,11 @@
     End Function
     Public Function setPosition(value As Object) As VbaStyle
         setPosition = Me
-        pPosition = CssPositionEnum.CssPosition_Absolute
+        If value.Equals(CSS_ABSOLUTE_POSITION_TAG) Then
+            pPosition = CssPositionEnum.CssPosition_Absolute
+        Else
+            pPosition = CssPositionEnum.CssPosition_Relative
+        End If
     End Function
     Public Function setTop(value As Object) As VbaStyle
         setTop = Me
@@ -382,9 +406,6 @@
     End Function
 
     Public Function getPropertyAsString(propType As VbaStylePropertyEnum) As Object
-        Dim value As Object
-        '----------------------------------------------------------------------------------------------------------
-
         Select Case propType
             '[Position]
             Case VbaStylePropertyEnum.StyleProperty_Float : Return getFloat()
@@ -432,8 +453,6 @@
             Case VbaStylePropertyEnum.StyleProperty_ImageSize : Return getImageSize()
             Case Else : Return vbNullString
         End Select
-
-
     End Function
 
     Public Function getDto() As Dictionary(Of VbaStylePropertyEnum, Object)

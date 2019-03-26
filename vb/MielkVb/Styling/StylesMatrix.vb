@@ -24,7 +24,7 @@ Public Class StylesMatrix
     Public Sub LoadStyles()
         Call addElementStyleSet()
         Call addIdStyleSet()
-        Call updatePropertiesArrayMap()
+        Call createPropertiesArrayMapFromScratch()
     End Sub
 
 #End Region
@@ -57,13 +57,13 @@ Public Class StylesMatrix
                 somethingAdded = True
             End If
         Next
-        If somethingAdded Then Call updatePropertiesArrayMap()
+        If somethingAdded Then Call createPropertiesArrayMapFromScratch()
 
     End Sub
 
-    Private Sub updatePropertiesArrayMap()
+    Private Sub createPropertiesArrayMapFromScratch()
 
-        Call Array.Clear(pPropertiesArraysMap, 0, pPropertiesArraysMap.Length)
+        Call resetPropertiesArrayMap()
         If Not pElementStyleSet Is Nothing Then Call applySingleStyleToPropertiesArray(pElementStyleSet)
 
         For Each styleSet In pClassStyleSets
@@ -78,6 +78,10 @@ Public Class StylesMatrix
         '    Call applySingleStyleToPropertiesArray(pInlineStyle)
         'End If
 
+    End Sub
+
+    Private Sub resetPropertiesArrayMap()
+        Call Array.Clear(pPropertiesArraysMap, 0, pPropertiesArraysMap.Length)
     End Sub
 
     Private Sub applySingleStyleToPropertiesArray(styleSet As StyleSet)

@@ -30,6 +30,18 @@ Public Enum CssFloatEnum
     CssFloat_Right = 2
 End Enum
 
+Public Enum CssHorizontalAlignment
+    CssHorizontalAlignment_Left = 1
+    CssHorizontalAlignment_Center = 2
+    CssHorizontalAlignment_Right = 3
+End Enum
+
+Public Enum CssVerticalAlignment
+    CssVerticalAlignment_Top = 1
+    CssVerticalAlignment_Middle = 2
+    CssVerticalAlignment_Bottom = 3
+End Enum
+
 Public Enum VbaStylePropertyEnum
     StyleProperty_Unknown = -1
     '[Position]

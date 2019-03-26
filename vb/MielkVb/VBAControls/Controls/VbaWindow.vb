@@ -12,17 +12,13 @@ Public Class VBAWindow
 
     Public Sub insertControls(htmlNode As XmlNode)
         Dim node As Object
-        Dim elementTag As String
         Dim control As IVbaControl
         '----------------------------------------------------------------------------------------------------------
 
         pControls = New Collection
         For Each node In htmlNode.ChildNodes
-            'elementTag = node.BaseName
-            elementTag = node.Name
-            control = createControlByTag(elementTag, Me)
+            control = createControlByXmlNode(node, Me)
             If Not control Is Nothing Then
-                Call control.LoadFromXml(node)
                 Call pControls.Add(control)
                 Call pVbWindow.AddControl(control.getVbNetObject)
             End If

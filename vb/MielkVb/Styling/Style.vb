@@ -123,17 +123,21 @@ Public Class Style
         ImageSize = convertValue(vbaObject.GetPropertyAsString(StylePropertyEnum.StyleProperty_ImageSize))
     End Sub
 
-    Private Function convertValue(ByVal strValue As String) As StylePropertyValue
-        If strValue Is Nothing Then
+    Private Function convertValue(ByVal value As Object) As StylePropertyValue
+        If value Is Nothing Then
             Return StylePropertyValue.Null()
-        ElseIf strValue.Length = 0 Then
-            Return StylePropertyValue.Null()
-        ElseIf strValue = "auto" Then
-            Return StylePropertyValue.Auto()
-        ElseIf strValue = "inherit" Then
-            Return StylePropertyValue.Inherited()
+        ElseIf TypeOf value Is String Then
+            If value.Length = 0 Then
+                Return StylePropertyValue.Null()
+            ElseIf value = "auto" Then
+                Return StylePropertyValue.Auto()
+            ElseIf value = "inherit" Then
+                Return StylePropertyValue.Inherited()
+            Else
+                Return New StylePropertyValue(value)
+            End If
         Else
-            Return New StylePropertyValue(strValue)
+            Return New StylePropertyValue(value)
         End If
     End Function
 
@@ -207,6 +211,7 @@ Public Class Style
             Return pBottom
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pBottom = value
         End Set
     End Property
@@ -216,6 +221,7 @@ Public Class Style
             Return pRight
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pRight = value
         End Set
     End Property
@@ -414,6 +420,7 @@ Public Class Style
             Return pBorderThickness
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pBorderThickness = value
         End Set
     End Property
@@ -447,6 +454,7 @@ Public Class Style
             Return pFontSize
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pFontSize = value
         End Set
     End Property
@@ -495,6 +503,7 @@ Public Class Style
             Return pImageWidth
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pImageWidth = value
         End Set
     End Property
@@ -504,6 +513,7 @@ Public Class Style
             Return pImageHeight
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pImageHeight = value
         End Set
     End Property
@@ -522,6 +532,7 @@ Public Class Style
             Return pImageSize
         End Get
         Set(value As StylePropertyValue)
+            Call applyForSizeOrPosition(value)
             pImageSize = value
         End Set
     End Property
