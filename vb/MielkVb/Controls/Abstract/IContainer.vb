@@ -13,12 +13,18 @@ Public Interface IContainer
     Function GetInnerHeight() As Single
     Function GetWidth() As Single
     Function GetInnerWidth() As Single
+    Function CalculateAutoHeight() As Single
+    Function CalculateAutoWidth() As Single
 
     Function GetPaddingLeft() As Single
     Function GetPaddingRight() As Single
     Function GetPaddingTop() As Single
     Function GetPaddingBottom() As Single
 
-    Sub RearrangeControls()
+    Sub UpdateView(Optional propagateDown As Boolean = False)
+    Sub UpdateLayout(Optional propagateDown As Boolean = False)
+    'Sub RearrangeControls()
+    'Sub ResizeControls()
+    Sub AdjustAfterChildrenSizeChange()
 
 End Interface

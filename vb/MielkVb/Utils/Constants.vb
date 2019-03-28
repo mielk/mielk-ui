@@ -8,4 +8,6 @@
     Public Const CSS_VERTICAL_ALIGNMENT_TOP As String = "top"
     Public Const CSS_VERTICAL_ALIGNMENT_MIDDLE As String = "middle"
     Public Const CSS_VERTICAL_ALIGNMENT_BOTTOM As String = "bottom"
+    Public Const AUTO As String = "auto"
+    Public Const INHERITED As String = "inherited"
 End Module

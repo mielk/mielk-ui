@@ -145,7 +145,14 @@ Public Class StylesMatrix
     Private Sub setPropertyValue(nodeType As StyleNodeTypeEnum, propertyType As StylePropertyEnum, value As StylePropertyValue)
         If Not value Is Nothing Then
             If Not value.IsNull Then
-                pPropertiesArraysMap(nodeType, propertyType) = value.Value
+                If value.IsAuto Then
+                    pPropertiesArraysMap(nodeType, propertyType) = AUTO
+                ElseIf value.IsInherited Then
+                    pPropertiesArraysMap(nodeType, propertyType) = INHERITED
+                Else
+                    pPropertiesArraysMap(nodeType, propertyType) = value.Value
+                End If
+
             End If
         End If
     End Sub
@@ -173,11 +180,13 @@ Public Class StylesMatrix
     End Sub
 
     Public Sub RemoveStyleClass(className As String)
-
+        'recalculate
+        Call createPropertiesArrayMapFromScratch()
     End Sub
 
     Public Sub AddInlineStyle(propertyType As Long, value As Object)
-
+        'recalculate
+        Call createPropertiesArrayMapFromScratch()
     End Sub
 
 #End Region

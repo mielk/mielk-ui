@@ -63,7 +63,7 @@ Public Class VbaButton
 
     Public Sub TriggerEvent(eventName As String)
         If eventName = "click" Then
-            Call MsgBox(pCaption & " clicked")
+            'Call MsgBox(pCaption & " clicked")
         End If
     End Sub
 

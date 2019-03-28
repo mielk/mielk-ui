@@ -13,11 +13,21 @@ form {
 	left: -1;
 	right: -1;
 	bottom: -1;
-	height: 48;
+	height: 55;
+	padding: 12;
 	background-color: rgb(255, 255, 255);
 	border-color: rgb(230, 230, 230);
 	border-thickness: 1;
 	horizontal-alignment: right;
+}
+
+.buttons-container {
+	position: relative;
+	float: right;
+	background-color: rgb(255, 0, 0);
+	width: auto;
+	height: auto;
+	padding: 0;
 }
 
 button {
@@ -57,7 +67,7 @@ button.cancel {
 	top: 6;
 	background-color: rgb(217, 83, 79);
 	border-color: rgb(212, 63, 58);
-	image-file-path: C:/Users/Tomek/Desktop/ok_white.png;
+	image-file-path: C:/Users/Tomek/Desktop/cancel_white.png;
 }
 
 button.cancel:hover {

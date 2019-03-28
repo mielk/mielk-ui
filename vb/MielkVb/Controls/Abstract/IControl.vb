@@ -16,7 +16,10 @@ Public Interface IControl
     Function GetWindow() As Window
 
     '[Size and position]
-    Sub UpdateSizeAndPosition(Optional ByRef anyChanges As Boolean = False)
+    Sub UpdateView(Optional propagateDown As Boolean = False)
+    Sub UpdateLayout(Optional propagateDown As Boolean = False)
+    'Sub UpdateSize(Optional ByRef anyChanges As Boolean = False)
+    'Sub UpdatePosition(Optional ByRef anyChanges As Boolean = False)
     Function GetWidth() As Single
     Function GetHeight() As Single
 

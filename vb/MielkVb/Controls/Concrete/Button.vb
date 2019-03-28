@@ -22,6 +22,8 @@ Public Class Button
     '[Style]
     Private pStylesMatrix As StylesMatrix
     Private pCurrentProperties(0 To CountStylePropertiesEnums()) As Object
+    Private pIsAutoWidth As Boolean
+    Private pIsAutoHeight As Boolean
     Private pImageList As ImageList
 
     '[State]
@@ -106,40 +108,14 @@ Public Class Button
 
 #Region "Rendering"
 
-    Private Sub updateView()
+    Public Sub UpdateView(Optional propagateDown As Boolean = False) Implements IControl.UpdateView
         Dim newProperties As Object() = calculateProperties()
         '---------------------------------------------------------------------------------------------------------
-        Dim sizeChanged As Boolean = False                  'size of this element and therefore size and layout of children elements
-        Dim positionChanged As Boolean = False              'position on the screen
-        Dim outsideLayoutChanged As Boolean = False         'properties that can affect layout of siblings elements
         Dim bordersChanged As Boolean = False               'borders
         Dim insidePropertiesChanged As Boolean = False      'i.e. background, font color - properties that doesn't affect any other controls.
         Dim imageChanged As Boolean = False
         '---------------------------------------------------------------------------------------------------------
 
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Float, newProperties(StylePropertyEnum.StyleProperty_Float), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Position, newProperties(StylePropertyEnum.StyleProperty_Position), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_BorderBox, newProperties(StylePropertyEnum.StyleProperty_BorderBox), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Top, newProperties(StylePropertyEnum.StyleProperty_Top), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Left, newProperties(StylePropertyEnum.StyleProperty_Left), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Bottom, newProperties(StylePropertyEnum.StyleProperty_Bottom), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Right, newProperties(StylePropertyEnum.StyleProperty_Right), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Width, newProperties(StylePropertyEnum.StyleProperty_Width), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MinWidth, newProperties(StylePropertyEnum.StyleProperty_MinWidth), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MaxWidth, newProperties(StylePropertyEnum.StyleProperty_MaxWidth), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Height, newProperties(StylePropertyEnum.StyleProperty_Height), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MinHeight, newProperties(StylePropertyEnum.StyleProperty_MinHeight), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MaxHeight, newProperties(StylePropertyEnum.StyleProperty_MaxHeight), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Padding, newProperties(StylePropertyEnum.StyleProperty_Padding), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingTop, newProperties(StylePropertyEnum.StyleProperty_PaddingTop), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingLeft, newProperties(StylePropertyEnum.StyleProperty_PaddingLeft), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingBottom, newProperties(StylePropertyEnum.StyleProperty_PaddingBottom), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingRight, newProperties(StylePropertyEnum.StyleProperty_PaddingRight), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Margin, newProperties(StylePropertyEnum.StyleProperty_Margin), outsideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginTop, newProperties(StylePropertyEnum.StyleProperty_MarginTop), outsideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginLeft, newProperties(StylePropertyEnum.StyleProperty_MarginLeft), outsideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginBottom, newProperties(StylePropertyEnum.StyleProperty_MarginBottom), outsideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginRight, newProperties(StylePropertyEnum.StyleProperty_MarginRight), outsideLayoutChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_BackgroundColor, newProperties(StylePropertyEnum.StyleProperty_BackgroundColor), insidePropertiesChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_BorderThickness, newProperties(StylePropertyEnum.StyleProperty_BorderThickness), bordersChanged)
         Call compareSingleProperty(StylePropertyEnum.StyleProperty_BorderColor, newProperties(StylePropertyEnum.StyleProperty_BorderColor), bordersChanged)
@@ -158,9 +134,6 @@ Public Class Button
         If insidePropertiesChanged Then Call updateInsideProperties()
         If imageChanged Then Call updateImage()
         If bordersChanged Then Call updateBorders()
-        If sizeChanged Then Call updateSize(outsideLayoutChanged)
-        If positionChanged Then Call updatePosition(outsideLayoutChanged)
-        If outsideLayoutChanged Then Call pParent.RearrangeControls()
 
     End Sub
 
@@ -174,15 +147,57 @@ Public Class Button
     End Sub
 
 
-    Public Sub UpdateSizeAndPosition(Optional ByRef anyChanges As Boolean = False) Implements IControl.UpdateSizeAndPosition
-        Call updateSize(anyChanges)
-        Call updatePosition(anyChanges)
+    Public Sub UpdateLayout(Optional propagateDown As Boolean = False) Implements IControl.UpdateLayout
+        Dim newProperties As Object() = calculateProperties()
+        '---------------------------------------------------------------------------------------------------------
+        Dim sizeChanged As Boolean = False                  'size of this element and therefore size and layout of children elements
+        Dim positionChanged As Boolean = False              'position on the screen
+        Dim insideLayoutChanged As Boolean = False          'properties that can affect layout of children elements
+        Dim outsideLayoutChanged As Boolean = False         'properties that can affect layout of siblings elements
+        '---------------------------------------------------------------------------------------------------------
+
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Float, newProperties(StylePropertyEnum.StyleProperty_Float), positionChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Position, newProperties(StylePropertyEnum.StyleProperty_Position), positionChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_BorderBox, newProperties(StylePropertyEnum.StyleProperty_BorderBox), sizeChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Top, newProperties(StylePropertyEnum.StyleProperty_Top), positionChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Left, newProperties(StylePropertyEnum.StyleProperty_Left), positionChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Bottom, newProperties(StylePropertyEnum.StyleProperty_Bottom), positionChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Right, newProperties(StylePropertyEnum.StyleProperty_Right), positionChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Width, newProperties(StylePropertyEnum.StyleProperty_Width), sizeChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MinWidth, newProperties(StylePropertyEnum.StyleProperty_MinWidth), sizeChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MaxWidth, newProperties(StylePropertyEnum.StyleProperty_MaxWidth), sizeChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Height, newProperties(StylePropertyEnum.StyleProperty_Height), sizeChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MinHeight, newProperties(StylePropertyEnum.StyleProperty_MinHeight), sizeChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MaxHeight, newProperties(StylePropertyEnum.StyleProperty_MaxHeight), sizeChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Padding, newProperties(StylePropertyEnum.StyleProperty_Padding), insideLayoutChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingTop, newProperties(StylePropertyEnum.StyleProperty_PaddingTop), insideLayoutChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingLeft, newProperties(StylePropertyEnum.StyleProperty_PaddingLeft), insideLayoutChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingBottom, newProperties(StylePropertyEnum.StyleProperty_PaddingBottom), insideLayoutChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingRight, newProperties(StylePropertyEnum.StyleProperty_PaddingRight), insideLayoutChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Margin, newProperties(StylePropertyEnum.StyleProperty_Margin), outsideLayoutChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginTop, newProperties(StylePropertyEnum.StyleProperty_MarginTop), outsideLayoutChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginLeft, newProperties(StylePropertyEnum.StyleProperty_MarginLeft), outsideLayoutChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginBottom, newProperties(StylePropertyEnum.StyleProperty_MarginBottom), outsideLayoutChanged)
+        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginRight, newProperties(StylePropertyEnum.StyleProperty_MarginRight), outsideLayoutChanged)
+
+        If sizeChanged Then Call UpdateSize(insideLayoutChanged)
+        If positionChanged Then Call UpdatePosition(outsideLayoutChanged)
+
+        'If sizeChanged Then Call UpdateSize(outsideLayoutChanged)
+        'If positionChanged Then Call UpdatePosition(outsideLayoutChanged)
+        'If outsideLayoutChanged Then Call pParent.AdjustAfterChildrenSizeChange()
+
     End Sub
 
-    Private Sub updateSize(Optional ByRef anyChanges As Boolean = False)
-        Dim height As Single = CalculateControlHeight(pParent, pCurrentProperties)
-        Dim width As Single = CalculateControlWidth(pParent, pCurrentProperties)
+    Public Sub UpdateSize(Optional ByRef anyChanges As Boolean = False) 'Implements IControl.UpdateSize
+        Dim height As Single
+        Dim width As Single
         '------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        Call checkIfAnyDimensionIsAutoScaled()
+
+        height = CalculateControlHeight(Me, pCurrentProperties)
+        width = CalculateControlWidth(Me, pCurrentProperties)
 
         If height <> Me.Height Then
             anyChanges = True
@@ -196,61 +211,22 @@ Public Class Button
 
     End Sub
 
-    Private Sub updatePosition(Optional ByRef anyChanges As Boolean = False)
+    Private Sub checkIfAnyDimensionIsAutoScaled()
+        pIsAutoWidth = isAutoValue(pCurrentProperties(StylePropertyEnum.StyleProperty_Width))
+        pIsAutoHeight = isAutoValue(pCurrentProperties(StylePropertyEnum.StyleProperty_Height))
+    End Sub
+
+    Public Sub UpdatePosition(Optional ByRef anyChanges As Boolean = False) 'Implements IControl.UpdatePosition
         If pCurrentProperties(StylePropertyEnum.StyleProperty_Position) = CssPositionEnum.CssPosition_Absolute Then
-            Me.Left = calculateLeft()
-            Me.Top = calculateTop()
+            Me.Left = CalculateControlLeft(Me, pCurrentProperties)
+            Me.Top = CalculateControlTop(Me, pCurrentProperties)
         Else
 
         End If
     End Sub
 
-    Private Function calculateLeft() As Single
-        Dim parentWidth As Single
-        Dim left As Object
-        Dim right As Object
-        '------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-        left = pCurrentProperties(StylePropertyEnum.StyleProperty_Left)
-        right = pCurrentProperties(StylePropertyEnum.StyleProperty_Right)
-
-        If left Is Nothing Then
-            If Not right Is Nothing Then
-                parentWidth = pParent.GetWidth
-                Return parentWidth - right - Me.Width
-            Else
-                Return 0
-            End If
-        Else
-            Return CSng(left)
-        End If
-
-    End Function
-
-    Private Function calculateTop() As Single
-        Dim parentHeight As Single
-        Dim top As Object
-        Dim bottom As Object
-        '------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-        top = pCurrentProperties(StylePropertyEnum.StyleProperty_Top)
-        bottom = pCurrentProperties(StylePropertyEnum.StyleProperty_Bottom)
-
-        If top Is Nothing Then
-            If Not bottom Is Nothing Then
-                parentHeight = pParent.GetHeight
-                Return parentHeight - bottom - Me.Height
-            Else
-                Return 0
-            End If
-        Else
-            Return CSng(top)
-        End If
-
-    End Function
-
     Private Sub updateInsideProperties()
-        Me.Font = createFont()
+        Me.Font = createFont(pCurrentProperties)
         Me.ForeColor = pCurrentProperties(StylePropertyEnum.StyleProperty_FontColor)
         Call updateBackColor()
     End Sub
@@ -296,17 +272,6 @@ Public Class Button
 
     End Sub
 
-    Private Function createFont() As Font
-        Dim bold As System.Drawing.FontStyle
-        Dim family As String
-        Dim size As Single
-        '------------------------------------------------------------------------------------------------------------------------------------------------------------
-        bold = IIf(pCurrentProperties(StylePropertyEnum.StyleProperty_FontBold), FontStyle.Bold, FontStyle.Regular)
-        family = pCurrentProperties(StylePropertyEnum.StyleProperty_FontFamily)
-        size = pCurrentProperties(StylePropertyEnum.StyleProperty_FontSize)
-        Return New Font(family, size, bold)
-    End Function
-
     Private Sub updateBorders()
         Dim thickness As Single
         Dim color As Object
@@ -320,6 +285,7 @@ Public Class Button
             End With
         End If
     End Sub
+
 
 #End Region
 
@@ -384,17 +350,14 @@ Public Class Button
 
     Public Sub AddStyleClass(name As String) Implements IControl.AddStyleClass
         Call pStylesMatrix.AddStyleClass(name)
-        Call updateView()
     End Sub
 
     Public Sub RemoveStyleClass(name As String) Implements IControl.RemoveStyleClass
         Call pStylesMatrix.RemoveStyleClass(name)
-        Call updateView()
     End Sub
 
     Public Sub SetStyleProperty(propertyType As Long, value As Object) Implements IControl.SetStyleProperty
         Call pStylesMatrix.AddInlineStyle(propertyType, value)
-        Call updateView()
     End Sub
 
     Private Function calculateProperties() As Object
@@ -420,12 +383,12 @@ Public Class Button
 
     Private Sub hover()
         pState = StyleNodeTypeEnum.StyleNodeType_Hover
-        Call updateView()
+        Call UpdateView()
     End Sub
 
     Private Sub unhover()
         pState = StyleNodeTypeEnum.StyleNodeType_Normal
-        Call updateView()
+        Call UpdateView()
     End Sub
 
 #End Region
