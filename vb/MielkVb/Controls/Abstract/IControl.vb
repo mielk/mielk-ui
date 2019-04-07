@@ -3,25 +3,34 @@
 Public Interface IControl
 
     '[Style classes]
-    Sub AddStyleClass(name As String)
-    Sub RemoveStyleClass(name As String)
-    Sub SetStyleProperty(propertyType As Long, value As Object)
+    Sub SetStyleClasses(name As String, Optional invalidate As Boolean = True)
+    Sub AddStyleClasses(name As String, Optional invalidate As Boolean = True)
+    Sub RemoveStyleClasses(name As String, Optional invalidate As Boolean = True)
+    Sub SetStyleProperty(propertyType As Long, value As Object, Optional invalidate As Boolean = True)
     Function GetStylesManager() As StylesManager
 
     '[Meta]
     Function GetId() As String
     Function GetElementTag() As String
     Sub SetParent(parent As IContainer)
-    Function GetParent() As IContainer
+    Function GetParent(Optional level As Integer = 0) As IContainer
     Function GetWindow() As Window
+    Function GetLevel() As Integer
 
     '[Size and position]
-    Sub UpdateView(Optional propagateDown As Boolean = False)
-    Sub UpdateLayout(Optional propagateDown As Boolean = False)
-    'Sub UpdateSize(Optional ByRef anyChanges As Boolean = False)
-    'Sub UpdatePosition(Optional ByRef anyChanges As Boolean = False)
+    Function IsRendered() As Boolean
     Function GetWidth() As Single
     Function GetHeight() As Single
+    Function GetSizeType(prop As StylePropertyEnum) As ControlSizeTypeEnum
+
+    Sub UpdateHeight()
+    Sub UpdateWidth()
+
+    'Sub UpdateView(Optional propagateDown As Boolean = False)
+    'Sub UpdateLayout(Optional propagateDown As Boolean = False)
+    'Sub AddToResizeQueue(prop As StylePropertyEnum)
+
+
 
     ''[Setting inline properties]
     'Sub SetTop(value As VariantType?)

@@ -17,6 +17,7 @@ Public Class Div
     Private pListener As Object
     Private pHandle As IntPtr
     Private pId As String
+    Private pLevel As Integer
 
     '[Controls]
     Private pControls As Collection
@@ -25,8 +26,10 @@ Public Class Div
     '[Style]
     Private pStylesMatrix As StylesMatrix
     Private pCurrentProperties(0 To CountStylePropertiesEnums()) As Object
-    Private pIsAutoWidth As Boolean
-    Private pIsAutoHeight As Boolean
+    Private pHeightValueType As ControlSizeTypeEnum
+    Private pWidthValueType As ControlSizeTypeEnum
+    Private pTopValueType As ControlSizeTypeEnum
+    Private pLeftValueType As ControlSizeTypeEnum
 
     '[State]
     Private pIsRendered As Boolean
@@ -71,6 +74,7 @@ Public Class Div
 
     Public Sub SetParent(parent As IContainer) Implements IControl.SetParent
         pParent = parent
+        pLevel = pParent.GetLevel() + 1
     End Sub
 
 #End Region
@@ -78,8 +82,21 @@ Public Class Div
 
 #Region "Getters"
 
-    Public Function GetParent() As IContainer Implements IContainer.GetParent, IControl.GetParent
-        Return pParent
+    Public Function GetLevel() As Integer Implements IControl.GetLevel, IContainer.GetLevel
+        Return pLevel
+    End Function
+
+    Public Function GetParent(Optional level As Integer = 0) As IContainer Implements IContainer.GetParent, IControl.GetParent
+        If level = 0 Then
+            Return pParent
+        Else
+            Dim i As Integer
+            Dim parent As IContainer : parent = pParent
+            For i = pLevel - 2 To level Step -1
+                parent = parent.GetParent
+            Next i
+            Return parent
+        End If
     End Function
 
     Public Function GetWindow() As Window Implements IContainer.GetWindow, IControl.GetWindow
@@ -93,6 +110,8 @@ Public Class Div
     Public Function GetElementTag() As String Implements IControl.GetElementTag
         Return TAG_NAME
     End Function
+
+
 
     'Public Function GetBorderBox() As Boolean
     '    Return pBorderBox
@@ -115,6 +134,15 @@ Public Class Div
     'End Function
 
 
+    Public Function GetSizeType(prop As StylePropertyEnum) As ControlSizeTypeEnum Implements IControl.GetSizeType, IContainer.GetSizeType
+        If prop = StylePropertyEnum.StyleProperty_Width Then
+            Return pWidthValueType
+        ElseIf prop = StylePropertyEnum.StyleProperty_Height Then
+            Return pHeightValueType
+        Else
+            Return ControlSizeTypeEnum.ControlSizeType_Const
+        End If
+    End Function
 
     Public Function GetWidth() As Single Implements IContainer.GetWidth, IControl.GetWidth
         Return Me.Width
@@ -206,150 +234,288 @@ Public Class Div
 
 #Region "Rendering"
 
-    Public Sub UpdateView(Optional propagateDown As Boolean = False) Implements IControl.UpdateView, IContainer.UpdateView
-        Dim newProperties As Object() = calculateProperties()
+    Public Function IsRendered() As Boolean Implements IControl.IsRendered
+        Return pIsRendered
+    End Function
+
+    Private Sub Render()
+        pCurrentProperties = calculateProperties()
+        Call updateSizeValueTypes()
+        Call updatePositionValueTypes()
+        Call RQ.AddResizeTask(Me, StylePropertyEnum.StyleProperty_Width)
+        Call RQ.AddResizeTask(Me, StylePropertyEnum.StyleProperty_Height)
+        Call RQ.AddLayoutTask(Me)
+    End Sub
+
+    Private Sub updateSizeValueTypes(Optional ByRef heightChanged As Boolean = False, Optional ByRef widthChanged As Boolean = False)
+        Dim height As ControlSizeTypeEnum
+        Dim width As ControlSizeTypeEnum
         '---------------------------------------------------------------------------------------------------------
-        Dim bordersChanged As Boolean = False               'borders
-        Dim insidePropertiesChanged As Boolean = False      'i.e. background, font color - properties that doesn't affect any other controls.
+
+        height = GetControlSizeType(pCurrentProperties(StylePropertyEnum.StyleProperty_Height))
+        width = GetControlSizeType(pCurrentProperties(StylePropertyEnum.StyleProperty_Width))
+
+        If height <> pHeightValueType Then
+            pHeightValueType = height
+            heightChanged = True
+        End If
+
+        If width <> pWidthValueType Then
+            pWidthValueType = width
+            widthChanged = True
+        End If
+
+    End Sub
+
+    Private Sub updatePositionValueTypes(Optional ByRef topChanged As Boolean = False, Optional ByRef leftChanged As Boolean = False)
+        Dim top As ControlSizeTypeEnum
+        Dim left As ControlSizeTypeEnum
+        '---------------------------------------------------------------------------------------------------------
+
+        top = GetControlSizeType(pCurrentProperties(StylePropertyEnum.StyleProperty_Top))
+        left = GetControlSizeType(pCurrentProperties(StylePropertyEnum.StyleProperty_Left))
+
+        If top <> pTopValueType Then
+            pTopValueType = top
+            topChanged = True
+        End If
+
+        If left <> pLeftValueType Then
+            pLeftValueType = left
+            leftChanged = True
+        End If
+
+    End Sub
+
+
+
+
+
+
+    Public Sub UpdateHeight() Implements IControl.UpdateHeight, IContainer.UpdateHeight
+        Dim heightUpdateKey As String : heightUpdateKey = Me.GetHashCode & "|" & StylePropertyEnum.StyleProperty_Height
+        Dim widthUpdateKey As String : widthUpdateKey = Me.GetHashCode & "|" & StylePropertyEnum.StyleProperty_Width
         Dim ctrl As IControl
+        Dim heightAlreadySet As Boolean
         '---------------------------------------------------------------------------------------------------------
 
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_BackgroundColor, newProperties(StylePropertyEnum.StyleProperty_BackgroundColor), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_BorderThickness, newProperties(StylePropertyEnum.StyleProperty_BorderThickness), bordersChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_BorderColor, newProperties(StylePropertyEnum.StyleProperty_BorderColor), bordersChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_FontSize, newProperties(StylePropertyEnum.StyleProperty_FontSize), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_FontFamily, newProperties(StylePropertyEnum.StyleProperty_FontFamily), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_FontColor, newProperties(StylePropertyEnum.StyleProperty_FontColor), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_FontBold, newProperties(StylePropertyEnum.StyleProperty_FontBold), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_HorizontalAlignment, newProperties(StylePropertyEnum.StyleProperty_HorizontalAlignment), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_VerticalAlignment, newProperties(StylePropertyEnum.StyleProperty_VerticalAlignment), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageFilePath, newProperties(StylePropertyEnum.StyleProperty_ImageFilePath), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageName, newProperties(StylePropertyEnum.StyleProperty_ImageName), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageWidth, newProperties(StylePropertyEnum.StyleProperty_ImageWidth), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageHeight, newProperties(StylePropertyEnum.StyleProperty_ImageHeight), insidePropertiesChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageSize, newProperties(StylePropertyEnum.StyleProperty_ImageSize), insidePropertiesChanged)
-
-        If insidePropertiesChanged Then Call updateInsideProperties()
-        If bordersChanged Then Call updateBorders()
-
-        If propagateDown Then
-            For Each ctrl In pControls
-                Call ctrl.UpdateView(True)
-            Next
-        End If
-
-    End Sub
-
-    Private Sub compareSingleProperty(propertyType As StylePropertyEnum, propertyValue As Object, ByRef changeMarker As Boolean)
-        If Not propertyValue Is Nothing Then
-            If propertyValue <> pCurrentProperties(propertyType) Then
-                pCurrentProperties(propertyType) = propertyValue
-                changeMarker = True
+        If RQ.HasKey(heightUpdateKey) Then
+            Call RQ.removeKey(heightUpdateKey)
+            If pHeightValueType = ControlSizeTypeEnum.ControlSizeType_Const Then
+                Me.Height = CalculateControlHeight(Me, pCurrentProperties)
+                heightAlreadySet = True
+                For Each ctrl In pControls
+                    Call ctrl.UpdateHeight()
+                Next
+            ElseIf pHeightValueType = ControlSizeTypeEnum.ControlSizeType_Auto Then
+                For Each ctrl In pControls
+                    Call ctrl.UpdateHeight()
+                Next
+            ElseIf pHeightValueType = ControlSizeTypeEnum.ControlSizeType_ParentRelative Then
+                'not applies for Window (it has no parent)
             End If
+
+            If Not RQ.HasKey(widthUpdateKey) Then
+                Call arrangeControls()
+                If Not heightAlreadySet Then
+                    Me.Height = CalculateControlHeight(Me, pCurrentProperties)
+                End If
+            End If
+
         End If
+
     End Sub
 
-
-    Public Sub UpdateLayout(Optional propagateDown As Boolean = False) Implements IControl.UpdateLayout, IContainer.UpdateLayout
-        Dim newProperties As Object() = calculateProperties()
+    Public Sub UpdateWidth() Implements IControl.UpdateWidth, IContainer.UpdateWidth
+        Dim widthUpdateKey As String : widthUpdateKey = Me.GetHashCode & "|" & StylePropertyEnum.StyleProperty_Width
+        Dim heightUpdateKey As String : heightUpdateKey = Me.GetHashCode & "|" & StylePropertyEnum.StyleProperty_Height
+        Dim ctrl As IControl
+        Dim widthAlreadySet As Boolean
         '---------------------------------------------------------------------------------------------------------
-        Dim sizeChanged As Boolean = False                  'size of this element and therefore size and layout of children elements
-        Dim positionChanged As Boolean = False              'position on the screen
-        Dim insideLayoutChanged As Boolean = False          'properties that can affect layout of children elements
-        Dim outsideLayoutChanged As Boolean = False         'properties that can affect layout of siblings elements
+
+        If RQ.HasKey(widthUpdateKey) Then
+            Call RQ.removeKey(widthUpdateKey)
+            If pHeightValueType = ControlSizeTypeEnum.ControlSizeType_Const Then
+                Me.Width = CalculateControlHeight(Me, pCurrentProperties)
+                widthAlreadySet = True
+                For Each ctrl In pControls
+                    Call ctrl.UpdateHeight()
+                Next
+            ElseIf pHeightValueType = ControlSizeTypeEnum.ControlSizeType_Auto Then
+                For Each ctrl In pControls
+                    Call ctrl.UpdateHeight()
+                Next
+            ElseIf pHeightValueType = ControlSizeTypeEnum.ControlSizeType_ParentRelative Then
+                'not applies for Window (it has no parent)
+            End If
+
+            If Not RQ.HasKey(heightUpdateKey) Then
+                Call arrangeControls()
+                If Not widthAlreadySet Then
+                    Me.Width = CalculateControlHeight(Me, pCurrentProperties)
+                End If
+            End If
+
+        End If
+
+    End Sub
+
+    Private Sub arrangeControls()
+        Dim key As String : key = Me.GetHashCode & "|Layout"
         '---------------------------------------------------------------------------------------------------------
+        If RQ.HasKey(key) Then
 
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Float, newProperties(StylePropertyEnum.StyleProperty_Float), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Position, newProperties(StylePropertyEnum.StyleProperty_Position), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_BorderBox, newProperties(StylePropertyEnum.StyleProperty_BorderBox), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Top, newProperties(StylePropertyEnum.StyleProperty_Top), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Left, newProperties(StylePropertyEnum.StyleProperty_Left), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Bottom, newProperties(StylePropertyEnum.StyleProperty_Bottom), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Right, newProperties(StylePropertyEnum.StyleProperty_Right), positionChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Width, newProperties(StylePropertyEnum.StyleProperty_Width), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MinWidth, newProperties(StylePropertyEnum.StyleProperty_MinWidth), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MaxWidth, newProperties(StylePropertyEnum.StyleProperty_MaxWidth), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Height, newProperties(StylePropertyEnum.StyleProperty_Height), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MinHeight, newProperties(StylePropertyEnum.StyleProperty_MinHeight), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MaxHeight, newProperties(StylePropertyEnum.StyleProperty_MaxHeight), sizeChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Padding, newProperties(StylePropertyEnum.StyleProperty_Padding), insideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingTop, newProperties(StylePropertyEnum.StyleProperty_PaddingTop), insideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingLeft, newProperties(StylePropertyEnum.StyleProperty_PaddingLeft), insideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingBottom, newProperties(StylePropertyEnum.StyleProperty_PaddingBottom), insideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingRight, newProperties(StylePropertyEnum.StyleProperty_PaddingRight), insideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_Margin, newProperties(StylePropertyEnum.StyleProperty_Margin), outsideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginTop, newProperties(StylePropertyEnum.StyleProperty_MarginTop), outsideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginLeft, newProperties(StylePropertyEnum.StyleProperty_MarginLeft), outsideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginBottom, newProperties(StylePropertyEnum.StyleProperty_MarginBottom), outsideLayoutChanged)
-        Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginRight, newProperties(StylePropertyEnum.StyleProperty_MarginRight), outsideLayoutChanged)
+            '[Actual arranging layout]
 
-        If sizeChanged Then Call updateSize(insideLayoutChanged)
-        If positionChanged Then Call updatePosition(outsideLayoutChanged)
-        'If outsideLayoutChanged Or insideLayoutChanged Then Call pParent.RearrangeControls()
-        'If insideLayoutChanged And Not sizeChanged Then
-        '    Call ResizeControls()
-        '    Call RearrangeControls()
-        'End If
 
-        'Call updateSize(anyChanges)
-        'Call updatePosition()
-        'If anyChanges Then Call RearrangeControls()
-    End Sub
 
-    Private Sub updateSize(Optional ByRef anyChanges As Boolean = False) 'Implements IControl.UpdateSize
-        Dim height As Single
-        Dim width As Single
-        '------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-        Call checkIfAnyDimensionIsAutoScaled()
-
-        height = CalculateControlHeight(Me, pCurrentProperties)
-        width = CalculateControlWidth(Me, pCurrentProperties)
-
-        If height <> Me.Height Then
-            anyChanges = True
-            Me.Height = height
+            Call RQ.removeKey(key)
         End If
-
-        If width <> Me.Width Then
-            anyChanges = True
-            Me.Width = width
-        End If
-
-    End Sub
-
-    Private Sub checkIfAnyDimensionIsAutoScaled()
-        pIsAutoWidth = isAutoValue(pCurrentProperties(StylePropertyEnum.StyleProperty_Width))
-        pIsAutoHeight = isAutoValue(pCurrentProperties(StylePropertyEnum.StyleProperty_Height))
     End Sub
 
 
 
-    Private Sub updatePosition(Optional ByRef anyChanges As Boolean = False) 'Implements IControl.UpdatePosition
-        Dim left As Single : left = CalculateControlLeft(Me, pCurrentProperties)
-        Dim top As Single : top = CalculateControlTop(Me, pCurrentProperties)
-        '------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        If left <> Me.Left Then
-            anyChanges = True
-            Me.Left = left
-        End If
 
-        If top <> Me.Top Then
-            anyChanges = True
-            Me.Top = top
-        End If
 
-    End Sub
+    'Public Sub UpdateView(Optional propagateDown As Boolean = False) Implements IControl.UpdateView, IContainer.UpdateView
+    '    Dim newProperties As Object() = calculateProperties()
+    '    '---------------------------------------------------------------------------------------------------------
+    '    Dim bordersChanged As Boolean = False               'borders
+    '    Dim insidePropertiesChanged As Boolean = False      'i.e. background, font color - properties that doesn't affect any other controls.
+    '    Dim ctrl As IControl
+    '    '---------------------------------------------------------------------------------------------------------
 
-    Private Sub updateInsideProperties()
-        Me.BackColor = pCurrentProperties(StylePropertyEnum.StyleProperty_BackgroundColor)
-    End Sub
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_BackgroundColor, newProperties(StylePropertyEnum.StyleProperty_BackgroundColor), insidePropertiesChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_BorderThickness, newProperties(StylePropertyEnum.StyleProperty_BorderThickness), bordersChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_BorderColor, newProperties(StylePropertyEnum.StyleProperty_BorderColor), bordersChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_FontSize, newProperties(StylePropertyEnum.StyleProperty_FontSize), insidePropertiesChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_FontFamily, newProperties(StylePropertyEnum.StyleProperty_FontFamily), insidePropertiesChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_FontColor, newProperties(StylePropertyEnum.StyleProperty_FontColor), insidePropertiesChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_FontBold, newProperties(StylePropertyEnum.StyleProperty_FontBold), insidePropertiesChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_HorizontalAlignment, newProperties(StylePropertyEnum.StyleProperty_HorizontalAlignment), insidePropertiesChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_VerticalAlignment, newProperties(StylePropertyEnum.StyleProperty_VerticalAlignment), insidePropertiesChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageFilePath, newProperties(StylePropertyEnum.StyleProperty_ImageFilePath), insidePropertiesChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageName, newProperties(StylePropertyEnum.StyleProperty_ImageName), insidePropertiesChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageWidth, newProperties(StylePropertyEnum.StyleProperty_ImageWidth), insidePropertiesChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageHeight, newProperties(StylePropertyEnum.StyleProperty_ImageHeight), insidePropertiesChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_ImageSize, newProperties(StylePropertyEnum.StyleProperty_ImageSize), insidePropertiesChanged)
 
-    Private Sub updateBorders()
-        pBorderThickness = If(pCurrentProperties(StylePropertyEnum.StyleProperty_BorderThickness), 0)
-        pBorderColor = If(pCurrentProperties(StylePropertyEnum.StyleProperty_BorderColor), System.Drawing.Color.Transparent)
-    End Sub
+    '    If insidePropertiesChanged Then Call updateInsideProperties()
+    '    If bordersChanged Then Call updateBorders()
+
+    '    If propagateDown Then
+    '        For Each ctrl In pControls
+    '            Call ctrl.UpdateView(True)
+    '        Next
+    '    End If
+
+    'End Sub
+
+    'Private Sub compareSingleProperty(propertyType As StylePropertyEnum, propertyValue As Object, ByRef changeMarker As Boolean)
+    '    If Not propertyValue Is Nothing Then
+    '        If propertyValue <> pCurrentProperties(propertyType) Then
+    '            pCurrentProperties(propertyType) = propertyValue
+    '            changeMarker = True
+    '        End If
+    '    End If
+    'End Sub
+
+
+    'Public Sub UpdateLayout(Optional propagateDown As Boolean = False) Implements IControl.UpdateLayout, IContainer.UpdateLayout
+    '    Dim newProperties As Object() = calculateProperties()
+    '    '---------------------------------------------------------------------------------------------------------
+    '    Dim sizeChanged As Boolean = False                  'size of this element and therefore size and layout of children elements
+    '    Dim positionChanged As Boolean = False              'position on the screen
+    '    Dim insideLayoutChanged As Boolean = False          'properties that can affect layout of children elements
+    '    Dim outsideLayoutChanged As Boolean = False         'properties that can affect layout of siblings elements
+    '    '---------------------------------------------------------------------------------------------------------
+
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_Float, newProperties(StylePropertyEnum.StyleProperty_Float), positionChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_Position, newProperties(StylePropertyEnum.StyleProperty_Position), positionChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_BorderBox, newProperties(StylePropertyEnum.StyleProperty_BorderBox), sizeChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_Top, newProperties(StylePropertyEnum.StyleProperty_Top), positionChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_Left, newProperties(StylePropertyEnum.StyleProperty_Left), positionChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_Bottom, newProperties(StylePropertyEnum.StyleProperty_Bottom), positionChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_Right, newProperties(StylePropertyEnum.StyleProperty_Right), positionChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_Width, newProperties(StylePropertyEnum.StyleProperty_Width), sizeChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_MinWidth, newProperties(StylePropertyEnum.StyleProperty_MinWidth), sizeChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_MaxWidth, newProperties(StylePropertyEnum.StyleProperty_MaxWidth), sizeChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_Height, newProperties(StylePropertyEnum.StyleProperty_Height), sizeChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_MinHeight, newProperties(StylePropertyEnum.StyleProperty_MinHeight), sizeChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_MaxHeight, newProperties(StylePropertyEnum.StyleProperty_MaxHeight), sizeChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_Padding, newProperties(StylePropertyEnum.StyleProperty_Padding), insideLayoutChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingTop, newProperties(StylePropertyEnum.StyleProperty_PaddingTop), insideLayoutChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingLeft, newProperties(StylePropertyEnum.StyleProperty_PaddingLeft), insideLayoutChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingBottom, newProperties(StylePropertyEnum.StyleProperty_PaddingBottom), insideLayoutChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_PaddingRight, newProperties(StylePropertyEnum.StyleProperty_PaddingRight), insideLayoutChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_Margin, newProperties(StylePropertyEnum.StyleProperty_Margin), outsideLayoutChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginTop, newProperties(StylePropertyEnum.StyleProperty_MarginTop), outsideLayoutChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginLeft, newProperties(StylePropertyEnum.StyleProperty_MarginLeft), outsideLayoutChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginBottom, newProperties(StylePropertyEnum.StyleProperty_MarginBottom), outsideLayoutChanged)
+    '    Call compareSingleProperty(StylePropertyEnum.StyleProperty_MarginRight, newProperties(StylePropertyEnum.StyleProperty_MarginRight), outsideLayoutChanged)
+
+    '    If sizeChanged Then Call updateSize(insideLayoutChanged)
+    '    If positionChanged Then Call updatePosition(outsideLayoutChanged)
+    '    'If outsideLayoutChanged Or insideLayoutChanged Then Call pParent.RearrangeControls()
+    '    'If insideLayoutChanged And Not sizeChanged Then
+    '    '    Call ResizeControls()
+    '    '    Call RearrangeControls()
+    '    'End If
+
+    '    'Call updateSize(anyChanges)
+    '    'Call updatePosition()
+    '    'If anyChanges Then Call RearrangeControls()
+    'End Sub
+
+    'Private Sub updateSize(Optional ByRef anyChanges As Boolean = False) 'Implements IControl.UpdateSize
+    '    'Dim height As Single
+    '    'Dim width As Single
+    '    ''------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    '    'Call checkIfAnyDimensionIsAutoScaled()
+
+    '    'height = CalculateControlHeight(Me, pCurrentProperties)
+    '    'width = CalculateControlWidth(Me, pCurrentProperties)
+
+    '    'If height <> Me.Height Then
+    '    '    anyChanges = True
+    '    '    Me.Height = height
+    '    'End If
+
+    '    'If width <> Me.Width Then
+    '    '    anyChanges = True
+    '    '    Me.Width = width
+    '    'End If
+
+    'End Sub
+
+
+    'Private Sub updatePosition(Optional ByRef anyChanges As Boolean = False) 'Implements IControl.UpdatePosition
+    '    Dim left As Single : left = CalculateControlLeft(Me, pCurrentProperties)
+    '    Dim top As Single : top = CalculateControlTop(Me, pCurrentProperties)
+    '    '------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    '    If left <> Me.Left Then
+    '        anyChanges = True
+    '        Me.Left = left
+    '    End If
+
+    '    If top <> Me.Top Then
+    '        anyChanges = True
+    '        Me.Top = top
+    '    End If
+
+    'End Sub
+
+    'Private Sub updateInsideProperties()
+    '    Me.BackColor = pCurrentProperties(StylePropertyEnum.StyleProperty_BackgroundColor)
+    'End Sub
+
+    'Private Sub updateBorders()
+    '    pBorderThickness = If(pCurrentProperties(StylePropertyEnum.StyleProperty_BorderThickness), 0)
+    '    pBorderColor = If(pCurrentProperties(StylePropertyEnum.StyleProperty_BorderColor), System.Drawing.Color.Transparent)
+    'End Sub
 
     'Public Sub RearrangeControls() Implements IContainer.RearrangeControls
     '    Dim ctrl As IControl
@@ -365,68 +531,68 @@ Public Class Div
     '    Next
     'End Sub
 
-    Public Sub AdjustAfterChildrenSizeChange() Implements IContainer.AdjustAfterChildrenSizeChange
-        Dim width As Object
-        Dim height As Object
-        Dim anyChanges As Boolean
-        '---------------------------------------------------------------------------------------------------------
+    'Public Sub AdjustAfterChildrenSizeChange() 'Implements IContainer.AdjustAfterChildrenSizeChange
+    '    Dim width As Object
+    '    Dim height As Object
+    '    Dim anyChanges As Boolean
+    '    '---------------------------------------------------------------------------------------------------------
 
-        width = pCurrentProperties(StylePropertyEnum.StyleProperty_Width)
-        height = pCurrentProperties(StylePropertyEnum.StyleProperty_Height)
+    '    width = pCurrentProperties(StylePropertyEnum.StyleProperty_Width)
+    '    height = pCurrentProperties(StylePropertyEnum.StyleProperty_Height)
 
-        If Not IsNumeric(width) Then
-            If width = AUTO Then
-                width = CalculateAutoWidth()
-                If width <> Me.Width Then
-                    Me.Width = width
-                    anyChanges = True
-                End If
-                'Stop
-            End If
-        End If
+    '    If Not IsNumeric(width) Then
+    '        If width = AUTO Then
+    '            width = CalculateAutoWidth()
+    '            If width <> Me.Width Then
+    '                Me.Width = width
+    '                anyChanges = True
+    '            End If
+    '            'Stop
+    '        End If
+    '    End If
 
-        If Not IsNumeric(height) Then
-            If height = AUTO Then
-                height = CalculateAutoHeight()
-                If height <> Me.Height Then
-                    Me.Height = height
-                    anyChanges = True
-                End If
-            End If
-        End If
+    '    If Not IsNumeric(height) Then
+    '        If height = AUTO Then
+    '            height = CalculateAutoHeight()
+    '            If height <> Me.Height Then
+    '                Me.Height = height
+    '                anyChanges = True
+    '            End If
+    '        End If
+    '    End If
 
-        If anyChanges Then Call pParent.AdjustAfterChildrenSizeChange()
+    '    'If anyChanges Then Call pParent.AdjustAfterChildrenSizeChange()
 
-    End Sub
+    'End Sub
 
-    Public Function CalculateAutoHeight() As Single Implements IContainer.CalculateAutoHeight
-        Dim control As IControl
-        Dim height As Single
-        Dim minHeight As Object
-        Dim maxHeight As Object
-        '------------------------------------------------------------------------------------------------------------------------------------------------------------
+    'Public Function CalculateAutoHeight() As Single 'Implements IContainer.CalculateAutoHeight
+    '    Dim control As IControl
+    '    Dim height As Single
+    '    Dim minHeight As Object
+    '    Dim maxHeight As Object
+    '    '------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-        minHeight = pCurrentProperties(StylePropertyEnum.StyleProperty_MinHeight)
-        maxHeight = pCurrentProperties(StylePropertyEnum.StyleProperty_MaxHeight)
-        For Each control In pControls
-            height = control.GetHeight
-        Next
+    '    minHeight = pCurrentProperties(StylePropertyEnum.StyleProperty_MinHeight)
+    '    maxHeight = pCurrentProperties(StylePropertyEnum.StyleProperty_MaxHeight)
+    '    For Each control In pControls
+    '        height = control.GetHeight
+    '    Next
 
-        If Not minHeight Is Nothing Then
-            If height < minHeight Then height = minHeight
-        End If
+    '    If Not minHeight Is Nothing Then
+    '        If height < minHeight Then height = minHeight
+    '    End If
 
-        If Not maxHeight Is Nothing Then
-            If height > maxHeight Then height = maxHeight
-        End If
+    '    If Not maxHeight Is Nothing Then
+    '        If height > maxHeight Then height = maxHeight
+    '    End If
 
-        Return height
+    '    Return height
 
-    End Function
+    'End Function
 
-    Public Function CalculateAutoWidth() As Single Implements IContainer.CalculateAutoWidth
-        Return 0
-    End Function
+    'Public Function CalculateAutoWidth() As Single 'Implements IContainer.CalculateAutoWidth
+    '    Return 0
+    'End Function
 
 #End Region
 
@@ -521,16 +687,27 @@ Public Class Div
 
 #Region "Styles - Local"
 
-    Public Sub AddStyleClass(name As String) Implements IControl.AddStyleClass
-        Call pStylesMatrix.AddStyleClass(name)
+    Public Sub SetStyleClasses(classes As String, Optional invalidate As Boolean = True) Implements IControl.SetStyleClasses
+        With pStylesMatrix
+            Call .RemoveAllStyleClasses(False)
+            Call .AddStyleClasses(classes, True)
+        End With
+        If invalidate Then Render()
     End Sub
 
-    Public Sub RemoveStyleClass(name As String) Implements IControl.RemoveStyleClass
-        Call pStylesMatrix.RemoveStyleClass(name)
+    Public Sub AddStyleClasses(name As String, Optional invalidate As Boolean = True) Implements IControl.AddStyleClasses
+        Call pStylesMatrix.AddStyleClasses(name, True)
+        If invalidate Then Render()
     End Sub
 
-    Public Sub SetStyleProperty(propertyType As Long, value As Object) Implements IControl.SetStyleProperty
-        Call pStylesMatrix.AddInlineStyle(propertyType, value)
+    Public Sub RemoveStyleClasses(name As String, Optional invalidate As Boolean = True) Implements IControl.RemoveStyleClasses
+        Call pStylesMatrix.RemoveStyleClasses(name, True)
+        If invalidate Then Render()
+    End Sub
+
+    Public Sub SetStyleProperty(propertyType As Long, value As Object, Optional invalidate As Boolean = True) Implements IControl.SetStyleProperty
+        Call pStylesMatrix.AddInlineStyle(propertyType, value, True)
+        If invalidate Then Render()
     End Sub
 
     Private Function calculateProperties() As Object
@@ -572,12 +749,12 @@ Public Class Div
 
     Private Sub hover()
         pState = StyleNodeTypeEnum.StyleNodeType_Hover
-        Call UpdateView()
+        'Call UpdateView()
     End Sub
 
     Private Sub unhover()
         pState = StyleNodeTypeEnum.StyleNodeType_Normal
-        Call UpdateView()
+        'Call UpdateView()
     End Sub
 
 #End Region

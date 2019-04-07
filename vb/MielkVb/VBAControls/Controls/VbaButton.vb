@@ -21,7 +21,7 @@ Public Class VbaButton
         With pVbNetObject
             Call .SetCaption(pCaption)
             Call .SetListener(Me)
-            Call .AddStyleClass(pCssClass)
+            Call .SetStyleClasses(pCssClass, True)
         End With
     End Sub
 

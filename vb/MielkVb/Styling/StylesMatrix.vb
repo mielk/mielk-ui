@@ -14,17 +14,16 @@ Public Class StylesMatrix
 
 #Region "Constructor"
 
-    Public Sub New(parent As IControl, Optional runLoadingStyles As Boolean = True)
+    Public Sub New(parent As IControl)
         pParent = parent
         pClassStyleSets = New List(Of StyleSet)
         pInlineStyle = New StyleSet(vbNullString, vbNullString, vbNullString)
-        If runLoadingStyles Then LoadStyles()
+        Call loadStyles()
     End Sub
 
-    Public Sub LoadStyles()
+    Public Sub loadStyles()
         Call addElementStyleSet()
         Call addIdStyleSet()
-        Call createPropertiesArrayMapFromScratch()
     End Sub
 
 #End Region
@@ -53,17 +52,18 @@ Public Class StylesMatrix
 
         For Each styleSet In styleSets
             If Not styleSet Is Nothing Then
-                Call pClassStyleSets.Add(styleSet)
+
                 somethingAdded = True
             End If
         Next
-        If somethingAdded Then Call createPropertiesArrayMapFromScratch()
+        If somethingAdded Then Call recalculate()
 
     End Sub
 
-    Private Sub createPropertiesArrayMapFromScratch()
+    Private Sub recalculate()
 
         Call resetPropertiesArrayMap()
+
         If Not pElementStyleSet Is Nothing Then Call applySingleStyleToPropertiesArray(pElementStyleSet)
 
         For Each styleSet In pClassStyleSets
@@ -168,25 +168,47 @@ Public Class StylesMatrix
 
 #Region "Public methods"
 
-    Public Sub AddStyleClass(className As String)
+    Public Sub AddStyleClasses(classes As String, Optional update As Boolean = True)
+        Dim arr() As String
+        Dim className As String
+        '------------------------------------------------------------
+        arr = Split(classes, " ")
+        For Each className In arr
+            Call addStyleClass(className)
+        Next
+        If update Then Call recalculate()
+    End Sub
+
+    Private Sub addStyleClass(className As String)
         Dim tagClassStyleSet As StyleSet
         Dim classStyleSet As StyleSet
         '------------------------------------------------------------
+
         With GetStylesManager()
             tagClassStyleSet = .GetStyleByElementAndClass(pParent.GetElementTag, className)
             classStyleSet = .GetStyleByClassName(className)
         End With
-        Call addStyleSetToArray(tagClassStyleSet, classStyleSet)
+
+        With pClassStyleSets
+            If Not classStyleSet Is Nothing Then Call .Add(classStyleSet)
+            If Not tagClassStyleSet Is Nothing Then Call .Add(tagClassStyleSet)
+        End With
+
     End Sub
 
-    Public Sub RemoveStyleClass(className As String)
+    Public Sub RemoveStyleClasses(classes As String, Optional update As Boolean = True)
         'recalculate
-        Call createPropertiesArrayMapFromScratch()
+        If update Then Call recalculate()
     End Sub
 
-    Public Sub AddInlineStyle(propertyType As Long, value As Object)
+    Public Sub RemoveAllStyleClasses(Optional update As Boolean = True)
+        pClassStyleSets = New List(Of StyleSet)
+        If update Then Call recalculate()
+    End Sub
+
+    Public Sub AddInlineStyle(propertyType As Long, value As Object, Optional update As Boolean = True)
         'recalculate
-        Call createPropertiesArrayMapFromScratch()
+        If update Then Call recalculate()
     End Sub
 
 #End Region

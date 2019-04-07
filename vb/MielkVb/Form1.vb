@@ -23,6 +23,7 @@ Public Class Form1
         Me.TextBox1.Size = New System.Drawing.Size(142, 87)
 
         Call pWindow.SetIcon("C:\Users\Tomek\Desktop\testIcon.ico")
+        Call RQ.Run()
         Call pWindow.Display()
     End Sub
 

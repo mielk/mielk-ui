@@ -52,3 +52,15 @@
 	</div>
 
 </form>
+
+
+
+
+<form id="test-form" class="test test2" caption="[Title]">
+	<div id="buttons-panel" class="buttons-panel">
+		<div id="buttons-container" class="buttons-container">
+			<button id="ok" class="ok">[Ok]</button>
+			<button id="cancel" class="cancel">[Cancel]</button>
+		</div>
+	</div>
+</form>

@@ -91,7 +91,11 @@
     <Compile Include="Controls\Concrete\Window.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Controls\Enums\ControlSizeTypeEnum.vb" />
+    <Compile Include="Controls\Enums\ResizeTriggerEnum.vb" />
     <Compile Include="Controls\Helpers\CalculatingSize.vb" />
+    <Compile Include="Controls\Helpers\ViewQueue.vb" />
+    <Compile Include="Controls\Helpers\ResizeQueue.vb" />
     <Compile Include="Form1.vb">
       <SubType>Form</SubType>
     </Compile>

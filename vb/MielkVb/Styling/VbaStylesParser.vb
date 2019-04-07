@@ -126,7 +126,10 @@ Public Class VbaStylesParser
                 propertyEnum = convertStringToStyleProperty(propertyName)
                 If Not propertyEnum = VbaStylePropertyEnum.StyleProperty_Unknown Then
                     propertyValue = strLine.Substring(colonPosition + 1).Trim
-                    Call dict.Add(propertyEnum, propertyValue)
+                    With dict
+                        If .ContainsKey(propertyEnum) Then .Remove(propertyEnum)
+                        Call .Add(propertyEnum, propertyValue)
+                    End With
                 End If
             End If
         Next strLine

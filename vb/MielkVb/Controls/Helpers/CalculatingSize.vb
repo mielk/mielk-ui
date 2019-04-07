@@ -155,6 +155,18 @@
     End Function
 
 
+    Public Function GetControlSizeType(cssValue As String) As ControlSizeTypeEnum
+        If cssValue Is Nothing Then
+            Return ControlSizeTypeEnum.ControlSizeType_Auto
+        ElseIf CStr(cssValue) = AUTO Then
+            Return ControlSizeTypeEnum.ControlSizeType_Auto
+        ElseIf InStr(CStr(cssValue), "%") > 0 Then
+            Return ControlSizeTypeEnum.ControlSizeType_ParentRelative
+        Else
+            Return ControlSizeTypeEnum.ControlSizeType_Const
+        End If
+    End Function
+
 
     Public Function createFont(properties As Object) As Font
         Const DEFAULT_FONT_SIZE As Single = 10

@@ -5,6 +5,11 @@ Public Class VBAWindow
 
     Private pControls As Collection
     Private pVbWindow As Window
+    '----------------------------------------------------------------------------------------------------------------------------------------
+    Private pId As String
+    Private pCssClass As String
+    Private pCaption As String
+    '----------------------------------------------------------------------------------------------------------------------------------------
 
     Public Sub SetVbWindow(value As Window)
         pVbWindow = value
@@ -15,6 +20,8 @@ Public Class VBAWindow
         Dim control As IVbaControl
         '----------------------------------------------------------------------------------------------------------
 
+        Call loadAttributes(htmlNode)
+
         pControls = New Collection
         For Each node In htmlNode.ChildNodes
             control = createControlByXmlNode(node, Me)
@@ -23,6 +30,22 @@ Public Class VBAWindow
                 Call pVbWindow.AddControl(control.getVbNetObject)
             End If
         Next node
+
+    End Sub
+
+    Private Sub loadAttributes(xmlNode As Xml.XmlNode)
+        On Error Resume Next
+        pId = xmlNode.Attributes.ItemOf("id").Value
+        pCssClass = xmlNode.Attributes.ItemOf("class").Value
+        pCaption = xmlNode.Attributes.ItemOf("caption").Value
+        On Error GoTo 0
+
+        With pVbWindow
+            Call .SetId(pId)
+            Call .SetTitle(pCaption)
+            Call .SetStyleClasses(pCssClass, True)
+
+        End With
 
     End Sub
 

@@ -19,7 +19,7 @@
         pVbNetObject = New Div(pContainer.getVbNetObject, pId)
         With pVbNetObject
             Call .SetListener(Me)
-            Call .AddStyleClass(pCssClass)
+            Call .SetStyleClasses(pCssClass, True)
         End With
         If xmlNode.ChildNodes.Count Then
             Call loadChildrenControls(xmlNode.ChildNodes)
