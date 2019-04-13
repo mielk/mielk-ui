@@ -11,6 +11,35 @@ Public Class Form1
         'Me.Icon = New System.Drawing.Icon("C:\Users\Tomek\Desktop\mlmh.ico")
         Call testHtml()
         'Call testTransparentFrame()
+
+        With Me.ListBox1
+            Call .Items.Add("a")
+            Call .Items.Add("b")
+            Call .Items.Add("c")
+            Call .Items.Add("d")
+            Call .Items.Add("e")
+            Call .Items.Add("f")
+            Call .Items.Add("g")
+            Call .Items.Add("h")
+            Call .Items.Add("i")
+            Call .Items.Add("j")
+            Call .Items.Add("k")
+            Call .Items.Add("l")
+            Call .Items.Add("m")
+            Call .Items.Add("n")
+            Call .Items.Add("o")
+            Call .Items.Add("p")
+            Call .Items.Add("q")
+            Call .Items.Add("r")
+            Call .Items.Add("s")
+            Call .Items.Add("t")
+            Call .Items.Add("u")
+            Call .Items.Add("v")
+            Call .Items.Add("w")
+            Call .Items.Add("x")
+            Call .Items.Add("y")
+            Call .Items.Add("z")
+        End With
     End Sub
 
 
@@ -23,7 +52,6 @@ Public Class Form1
         Me.TextBox1.Size = New System.Drawing.Size(142, 87)
 
         Call pWindow.SetIcon("C:\Users\Tomek\Desktop\testIcon.ico")
-        Call RQ.Run()
         Call pWindow.Display()
     End Sub
 
@@ -97,6 +125,9 @@ Public Class Form1
         panel = New TransparentPanel
         'Dim panel As Panel
         'panel = New Panel
+
+        Exit Sub
+
         panel.BackColor = colorFromString("rgb(230, 230, 230)")
 
         panel.Opacity = 75
@@ -148,6 +179,10 @@ Public Class Form1
     End Sub
 
     Private Sub PictureBox1_Click(sender As Object, e As EventArgs)
+
+    End Sub
+
+    Private Sub ListBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ListBox1.SelectedIndexChanged
 
     End Sub
 End Class

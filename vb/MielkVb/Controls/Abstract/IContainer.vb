@@ -25,6 +25,7 @@ Public Interface IContainer
 
     Sub UpdateHeight()
     Sub UpdateWidth()
+    Sub ArrangeControls()
 
     'Sub UpdateView(Optional propagateDown As Boolean = False)
     'Sub UpdateLayout(Optional propagateDown As Boolean = False)

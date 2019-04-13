@@ -30,6 +30,7 @@ Public Class Div
     Private pWidthValueType As ControlSizeTypeEnum
     Private pTopValueType As ControlSizeTypeEnum
     Private pLeftValueType As ControlSizeTypeEnum
+    Private pHasAbsolutePosition As Boolean
 
     '[State]
     Private pIsRendered As Boolean
@@ -185,8 +186,6 @@ Public Class Div
     End Function
 
 
-
-
     ''[Background & borders]
     'Public Function GetBackgroundColor() As Color
     '    Return pBackgroundColor
@@ -227,6 +226,14 @@ Public Class Div
     '    Return pMarginLeft
     'End Function
 
+    Public Function GetMargin() As Coordinate Implements IControl.GetMargin
+        Stop
+    End Function
+
+    Public Function IsAbsolutePositioned() As Boolean Implements IControl.IsAbsolutePositioned
+        Return pTopValueType = ControlSizeTypeEnum.ControlSizeType_Const And pLeftValueType = ControlSizeTypeEnum.ControlSizeType_Const
+    End Function
+
 #End Region
 
 
@@ -238,7 +245,13 @@ Public Class Div
         Return pIsRendered
     End Function
 
-    Private Sub Render()
+
+    Public Sub addTasksToQueue()
+        Call addSizeTasksToQueue()
+        Call addViewTasksToQueue()
+    End Sub
+
+    Public Sub addSizeTasksToQueue()
         pCurrentProperties = calculateProperties()
         Call updateSizeValueTypes()
         Call updatePositionValueTypes()
@@ -246,51 +259,6 @@ Public Class Div
         Call RQ.AddResizeTask(Me, StylePropertyEnum.StyleProperty_Height)
         Call RQ.AddLayoutTask(Me)
     End Sub
-
-    Private Sub updateSizeValueTypes(Optional ByRef heightChanged As Boolean = False, Optional ByRef widthChanged As Boolean = False)
-        Dim height As ControlSizeTypeEnum
-        Dim width As ControlSizeTypeEnum
-        '---------------------------------------------------------------------------------------------------------
-
-        height = GetControlSizeType(pCurrentProperties(StylePropertyEnum.StyleProperty_Height))
-        width = GetControlSizeType(pCurrentProperties(StylePropertyEnum.StyleProperty_Width))
-
-        If height <> pHeightValueType Then
-            pHeightValueType = height
-            heightChanged = True
-        End If
-
-        If width <> pWidthValueType Then
-            pWidthValueType = width
-            widthChanged = True
-        End If
-
-    End Sub
-
-    Private Sub updatePositionValueTypes(Optional ByRef topChanged As Boolean = False, Optional ByRef leftChanged As Boolean = False)
-        Dim top As ControlSizeTypeEnum
-        Dim left As ControlSizeTypeEnum
-        '---------------------------------------------------------------------------------------------------------
-
-        top = GetControlSizeType(pCurrentProperties(StylePropertyEnum.StyleProperty_Top))
-        left = GetControlSizeType(pCurrentProperties(StylePropertyEnum.StyleProperty_Left))
-
-        If top <> pTopValueType Then
-            pTopValueType = top
-            topChanged = True
-        End If
-
-        If left <> pLeftValueType Then
-            pLeftValueType = left
-            leftChanged = True
-        End If
-
-    End Sub
-
-
-
-
-
 
     Public Sub UpdateHeight() Implements IControl.UpdateHeight, IContainer.UpdateHeight
         Dim heightUpdateKey As String : heightUpdateKey = Me.GetHashCode & "|" & StylePropertyEnum.StyleProperty_Height
@@ -315,12 +283,9 @@ Public Class Div
                 'not applies for Window (it has no parent)
             End If
 
-            If Not RQ.HasKey(widthUpdateKey) Then
-                Call arrangeControls()
-                If Not heightAlreadySet Then
-                    Me.Height = CalculateControlHeight(Me, pCurrentProperties)
-                End If
-            End If
+            Call UpdateWidth()
+            Call arrangeControls()
+            If Not heightAlreadySet Then Me.Height = CalculateControlHeight(Me, pCurrentProperties)
 
         End If
 
@@ -335,45 +300,191 @@ Public Class Div
 
         If RQ.HasKey(widthUpdateKey) Then
             Call RQ.removeKey(widthUpdateKey)
-            If pHeightValueType = ControlSizeTypeEnum.ControlSizeType_Const Then
-                Me.Width = CalculateControlHeight(Me, pCurrentProperties)
+            If pWidthValueType = ControlSizeTypeEnum.ControlSizeType_Const Then
+                Me.Width = CalculateControlWidth(Me, pCurrentProperties)
                 widthAlreadySet = True
                 For Each ctrl In pControls
                     Call ctrl.UpdateHeight()
                 Next
-            ElseIf pHeightValueType = ControlSizeTypeEnum.ControlSizeType_Auto Then
+            ElseIf pWidthValueType = ControlSizeTypeEnum.ControlSizeType_Auto Then
                 For Each ctrl In pControls
-                    Call ctrl.UpdateHeight()
+                    Call ctrl.UpdateWidth()
                 Next
-            ElseIf pHeightValueType = ControlSizeTypeEnum.ControlSizeType_ParentRelative Then
-                'not applies for Window (it has no parent)
+            ElseIf pWidthValueType = ControlSizeTypeEnum.ControlSizeType_ParentRelative Then
+                If RQ.HasKey(getParentUpdateKey(StylePropertyEnum.StyleProperty_Width)) Then
+                    Call pParent.UpdateWidth()
+                End If
+                Me.Width = CalculateControlWidth(Me, pCurrentProperties)
             End If
 
-            If Not RQ.HasKey(heightUpdateKey) Then
-                Call arrangeControls()
-                If Not widthAlreadySet Then
-                    Me.Width = CalculateControlHeight(Me, pCurrentProperties)
-                End If
-            End If
+            Call UpdateHeight()
+            Call arrangeControls()
+            If Not widthAlreadySet Then Me.Width = CalculateControlWidth(Me, pCurrentProperties)
 
         End If
 
     End Sub
 
-    Private Sub arrangeControls()
+    Public Sub ArrangeControls() Implements IContainer.ArrangeControls
         Dim key As String : key = Me.GetHashCode & "|Layout"
         '---------------------------------------------------------------------------------------------------------
-        If RQ.HasKey(key) Then
 
+        If RQ.HasKey(key) Then
+            Call RQ.removeKey(key)
             '[Actual arranging layout]
 
+        End If
 
+    End Sub
 
-            Call RQ.removeKey(key)
+    Private Sub updateSizeValueTypes(Optional ByRef heightChanged As Boolean = False, Optional ByRef widthChanged As Boolean = False)
+        Dim height As ControlSizeTypeEnum
+        Dim width As ControlSizeTypeEnum
+        '---------------------------------------------------------------------------------------------------------
+
+        height = GetControlSizeType(pCurrentProperties(StylePropertyEnum.StyleProperty_Height))
+        width = GetControlSizeType(pCurrentProperties(StylePropertyEnum.StyleProperty_Width))
+
+        If height <> pHeightValueType Then
+            pHeightValueType = height
+            heightChanged = True
+        End If
+
+        If width <> pWidthValueType Then
+            pWidthValueType = width
+            widthChanged = True
+        End If
+
+    End Sub
+
+    Private Sub updatePositionValueTypes(Optional ByRef topChanged As Boolean = False, Optional ByRef leftChanged As Boolean = False)
+        Dim topPositionType As ControlSizeTypeEnum
+        Dim leftPositionType As ControlSizeTypeEnum
+        '---------------------------------------------------------------------------------------------------------
+
+        pHasAbsolutePosition = (pCurrentProperties(StylePropertyEnum.StyleProperty_Position) = CssPositionEnum.CssPosition_Absolute)
+        topPositionType = GetControlSizeType(pCurrentProperties(StylePropertyEnum.StyleProperty_Top))
+        leftPositionType = GetControlSizeType(pCurrentProperties(StylePropertyEnum.StyleProperty_Left))
+
+        If topPositionType <> pTopValueType Then
+            pTopValueType = topPositionType
+            topChanged = True
+        End If
+
+        If leftPositionType <> pLeftValueType Then
+            pLeftValueType = leftPositionType
+            leftChanged = True
+        End If
+
+        If topPositionType = ControlSizeTypeEnum.ControlSizeType_Const Then Me.Top = CalculateControlTop(Me, pCurrentProperties)
+        If leftPositionType = ControlSizeTypeEnum.ControlSizeType_Const Then Me.Left = CalculateControlLeft(Me, pCurrentProperties)
+
+    End Sub
+
+    Private Function getParentUpdateKey(prop As StylePropertyEnum) As String
+        Return pParent.GetHashCode & "|" & prop
+    End Function
+
+    Public Function GetWidthSizeType() As ControlSizeTypeEnum Implements IControl.GetWidthSizeType
+        Return pWidthValueType
+    End Function
+
+    Public Function GetHeightSizeType() As ControlSizeTypeEnum Implements IControl.GetHeightSizeType
+        Return pHeightValueType
+    End Function
+
+    Public Sub LocateInContainer(ByRef top As Single, ByRef right As Single, ByRef bottom As Single, ByRef left As Single) Implements IControl.LocateInContainer
+        If pHasAbsolutePosition Then
+            If pTopValueType <> ControlSizeTypeEnum.ControlSizeType_Const Then Me.Top = CalculateControlTop(Me, pCurrentProperties)
+            If pLeftValueType <> ControlSizeTypeEnum.ControlSizeType_Const Then Me.Left = CalculateControlLeft(Me, pCurrentProperties)
+        Else
+            Stop
         End If
     End Sub
 
 
+
+
+
+    Private Sub addViewTasksToQueue()
+        Call VQ.Add(Me, StylePropertyEnum.StyleProperty_BackgroundColor)
+        Call VQ.Add(Me, StylePropertyEnum.StyleProperty_BorderThickness)
+        Call VQ.Add(Me, StylePropertyEnum.StyleProperty_BorderColor)
+        Call VQ.Add(Me, StylePropertyEnum.StyleProperty_FontSize)
+        Call VQ.Add(Me, StylePropertyEnum.StyleProperty_FontBold)
+        Call VQ.Add(Me, StylePropertyEnum.StyleProperty_FontColor)
+        Call VQ.Add(Me, StylePropertyEnum.StyleProperty_FontFamily)
+        Call VQ.Add(Me, StylePropertyEnum.StyleProperty_HorizontalAlignment)
+        Call VQ.Add(Me, StylePropertyEnum.StyleProperty_VerticalAlignment)
+    End Sub
+
+    Public Sub UpdateView(prop As StylePropertyEnum) Implements IControl.UpdateView
+        If prop = StylePropertyEnum.StyleProperty_BackgroundColor Then
+            Call updateBackground()
+        ElseIf prop = StylePropertyEnum.StyleProperty_BorderThickness Then
+            Call updateBorders()
+        ElseIf prop = StylePropertyEnum.StyleProperty_BorderColor Then
+            Call updateBorders()
+        ElseIf prop = StylePropertyEnum.StyleProperty_FontSize Then
+            Call updateFont()
+        ElseIf prop = StylePropertyEnum.StyleProperty_FontBold Then
+            Call updateFont()
+        ElseIf prop = StylePropertyEnum.StyleProperty_FontColor Then
+            Call updateFont()
+        ElseIf prop = StylePropertyEnum.StyleProperty_FontFamily Then
+            Call updateFont()
+        ElseIf prop = StylePropertyEnum.StyleProperty_HorizontalAlignment Then
+            Call updateAlignment()
+        ElseIf prop = StylePropertyEnum.StyleProperty_VerticalAlignment Then
+            Call updateAlignment()
+        End If
+    End Sub
+
+    Private Sub updateBackground()
+        Dim key As String : key = Me.GetHashCode & "|" & StylePropertyEnum.StyleProperty_BackgroundColor
+        '---------------------------------------------------------------------------------------------------------
+        If VQ.HasKey(key) Then
+            Call VQ.removeKey(key)
+            Me.BackColor = pCurrentProperties(StylePropertyEnum.StyleProperty_BackgroundColor)
+        End If
+    End Sub
+
+    Private Sub updateBorders()
+        Dim keyPrefix As String : keyPrefix = Me.GetHashCode & "|"
+        '---------------------------------------------------------------------------------------------------------
+
+        Call VQ.removeKey(keyPrefix & StylePropertyEnum.StyleProperty_BorderColor)
+        Call VQ.removeKey(keyPrefix & StylePropertyEnum.StyleProperty_BorderThickness)
+
+
+        'children
+
+    End Sub
+
+    Private Sub updateFont()
+        Dim keyPrefix As String : keyPrefix = Me.GetHashCode & "|"
+        '---------------------------------------------------------------------------------------------------------
+
+        Call VQ.removeKey(keyPrefix & StylePropertyEnum.StyleProperty_FontBold)
+        Call VQ.removeKey(keyPrefix & StylePropertyEnum.StyleProperty_FontSize)
+        Call VQ.removeKey(keyPrefix & StylePropertyEnum.StyleProperty_FontFamily)
+        Call VQ.removeKey(keyPrefix & StylePropertyEnum.StyleProperty_FontColor)
+
+        'children
+
+    End Sub
+
+    Private Sub updateAlignment()
+        Dim keyPrefix As String : keyPrefix = Me.GetHashCode & "|"
+        '---------------------------------------------------------------------------------------------------------
+
+        Call VQ.removeKey(keyPrefix & StylePropertyEnum.StyleProperty_HorizontalAlignment)
+        Call VQ.removeKey(keyPrefix & StylePropertyEnum.StyleProperty_VerticalAlignment)
+
+        pBorderThickness = If(pCurrentProperties(StylePropertyEnum.StyleProperty_BorderThickness), 0)
+        pBorderColor = If(pCurrentProperties(StylePropertyEnum.StyleProperty_BorderColor), System.Drawing.Color.Transparent)
+
+    End Sub
 
 
 
@@ -517,83 +628,6 @@ Public Class Div
     '    pBorderColor = If(pCurrentProperties(StylePropertyEnum.StyleProperty_BorderColor), System.Drawing.Color.Transparent)
     'End Sub
 
-    'Public Sub RearrangeControls() Implements IContainer.RearrangeControls
-    '    Dim ctrl As IControl
-    '    For Each ctrl In pControls
-    '        Call ctrl.UpdateLayout()
-    '    Next
-    'End Sub
-
-    'Public Sub ResizeControls() Implements IContainer.ResizeControls
-    '    Dim ctrl As IControl
-    '    For Each ctrl In pControls
-    '        Call ctrl.UpdateSize()
-    '    Next
-    'End Sub
-
-    'Public Sub AdjustAfterChildrenSizeChange() 'Implements IContainer.AdjustAfterChildrenSizeChange
-    '    Dim width As Object
-    '    Dim height As Object
-    '    Dim anyChanges As Boolean
-    '    '---------------------------------------------------------------------------------------------------------
-
-    '    width = pCurrentProperties(StylePropertyEnum.StyleProperty_Width)
-    '    height = pCurrentProperties(StylePropertyEnum.StyleProperty_Height)
-
-    '    If Not IsNumeric(width) Then
-    '        If width = AUTO Then
-    '            width = CalculateAutoWidth()
-    '            If width <> Me.Width Then
-    '                Me.Width = width
-    '                anyChanges = True
-    '            End If
-    '            'Stop
-    '        End If
-    '    End If
-
-    '    If Not IsNumeric(height) Then
-    '        If height = AUTO Then
-    '            height = CalculateAutoHeight()
-    '            If height <> Me.Height Then
-    '                Me.Height = height
-    '                anyChanges = True
-    '            End If
-    '        End If
-    '    End If
-
-    '    'If anyChanges Then Call pParent.AdjustAfterChildrenSizeChange()
-
-    'End Sub
-
-    'Public Function CalculateAutoHeight() As Single 'Implements IContainer.CalculateAutoHeight
-    '    Dim control As IControl
-    '    Dim height As Single
-    '    Dim minHeight As Object
-    '    Dim maxHeight As Object
-    '    '------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-    '    minHeight = pCurrentProperties(StylePropertyEnum.StyleProperty_MinHeight)
-    '    maxHeight = pCurrentProperties(StylePropertyEnum.StyleProperty_MaxHeight)
-    '    For Each control In pControls
-    '        height = control.GetHeight
-    '    Next
-
-    '    If Not minHeight Is Nothing Then
-    '        If height < minHeight Then height = minHeight
-    '    End If
-
-    '    If Not maxHeight Is Nothing Then
-    '        If height > maxHeight Then height = maxHeight
-    '    End If
-
-    '    Return height
-
-    'End Function
-
-    'Public Function CalculateAutoWidth() As Single 'Implements IContainer.CalculateAutoWidth
-    '    Return 0
-    'End Function
-
 #End Region
 
 
@@ -692,22 +726,22 @@ Public Class Div
             Call .RemoveAllStyleClasses(False)
             Call .AddStyleClasses(classes, True)
         End With
-        If invalidate Then Render()
+        If invalidate Then addTasksToQueue()
     End Sub
 
     Public Sub AddStyleClasses(name As String, Optional invalidate As Boolean = True) Implements IControl.AddStyleClasses
         Call pStylesMatrix.AddStyleClasses(name, True)
-        If invalidate Then Render()
+        If invalidate Then addTasksToQueue()
     End Sub
 
     Public Sub RemoveStyleClasses(name As String, Optional invalidate As Boolean = True) Implements IControl.RemoveStyleClasses
         Call pStylesMatrix.RemoveStyleClasses(name, True)
-        If invalidate Then Render()
+        If invalidate Then addTasksToQueue()
     End Sub
 
     Public Sub SetStyleProperty(propertyType As Long, value As Object, Optional invalidate As Boolean = True) Implements IControl.SetStyleProperty
         Call pStylesMatrix.AddInlineStyle(propertyType, value, True)
-        If invalidate Then Render()
+        If invalidate Then addTasksToQueue()
     End Sub
 
     Private Function calculateProperties() As Object

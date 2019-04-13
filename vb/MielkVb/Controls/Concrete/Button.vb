@@ -128,6 +128,14 @@ Public Class Button
         End If
     End Function
 
+    Public Function GetMargin() As Coordinate Implements IControl.GetMargin
+        Stop
+    End Function
+
+    Public Function IsAbsolutePositioned() As Boolean Implements IControl.IsAbsolutePositioned
+        Return pTopValueType = ControlSizeTypeEnum.ControlSizeType_Const And pLeftValueType = ControlSizeTypeEnum.ControlSizeType_Const
+    End Function
+
 #End Region
 
 
@@ -183,7 +191,33 @@ Public Class Button
 
 
 
+    Public Sub UpdateView(prop As StylePropertyEnum) Implements IControl.UpdateView
+        Dim key As String : key = Me.GetHashCode & "|" & prop
+        '---------------------------------------------------------------------------------------------------------
+        Call VQ.removeKey(key)
+        If prop = StylePropertyEnum.StyleProperty_BackgroundColor Then
+        ElseIf prop = StylePropertyEnum.StyleProperty_BorderThickness Then
+        ElseIf prop = StylePropertyEnum.StyleProperty_BorderColor Then
+        ElseIf prop = StylePropertyEnum.StyleProperty_FontSize Then
+        ElseIf prop = StylePropertyEnum.StyleProperty_FontBold Then
+        ElseIf prop = StylePropertyEnum.StyleProperty_FontColor Then
+        ElseIf prop = StylePropertyEnum.StyleProperty_FontFamily Then
+        ElseIf prop = StylePropertyEnum.StyleProperty_HorizontalAlignment Then
+        ElseIf prop = StylePropertyEnum.StyleProperty_VerticalAlignment Then
+        End If
+    End Sub
 
+    Public Sub LocateInContainer(ByRef top As Single, ByRef right As Single, ByRef bottom As Single, ByRef left As Single) Implements IControl.LocateInContainer
+        Stop
+    End Sub
+
+    Public Function GetWidthSizeType() As ControlSizeTypeEnum Implements IControl.GetWidthSizeType
+        Return pWidthValueType
+    End Function
+
+    Public Function GetHeightSizeType() As ControlSizeTypeEnum Implements IControl.GetHeightSizeType
+        Return pHeightValueType
+    End Function
 
 
 

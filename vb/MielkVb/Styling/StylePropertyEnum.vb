@@ -43,4 +43,6 @@
     StyleProperty_ImageWidth = 35
     StyleProperty_ImageHeight = 36
     StyleProperty_ImageSize = 37
+    '[Layout]
+    StyleProperty_Layout = 38
 End Enum

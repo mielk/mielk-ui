@@ -22,9 +22,16 @@ Public Interface IControl
     Function GetWidth() As Single
     Function GetHeight() As Single
     Function GetSizeType(prop As StylePropertyEnum) As ControlSizeTypeEnum
+    Function GetMargin() As Coordinate
 
     Sub UpdateHeight()
     Sub UpdateWidth()
+    Sub UpdateView(prop As StylePropertyEnum)
+
+    Function IsAbsolutePositioned() As Boolean
+    Function GetWidthSizeType() As ControlSizeTypeEnum
+    Function GetHeightSizeType() As ControlSizeTypeEnum
+    Sub LocateInContainer(ByRef top As Single, ByRef right As Single, ByRef bottom As Single, ByRef left As Single)
 
     'Sub UpdateView(Optional propagateDown As Boolean = False)
     'Sub UpdateLayout(Optional propagateDown As Boolean = False)

@@ -157,7 +157,7 @@
 
     Public Function GetControlSizeType(cssValue As String) As ControlSizeTypeEnum
         If cssValue Is Nothing Then
-            Return ControlSizeTypeEnum.ControlSizeType_Auto
+            Return ControlSizeTypeEnum.ControlSizeType_ParentRelative
         ElseIf CStr(cssValue) = AUTO Then
             Return ControlSizeTypeEnum.ControlSizeType_Auto
         ElseIf InStr(CStr(cssValue), "%") > 0 Then
